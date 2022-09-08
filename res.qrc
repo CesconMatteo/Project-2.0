@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Static/icon.png</file>
+	<file>Static/newfile.png</file>
+	<file>Static/openfile.png</file>
+	<file>Static/saveas.png</file>
+	<file>Static/save.png</file>
+	<file>Static/hovered_newfile.png</file>
+	<file>Static/hovered_openfile.png</file>
+	<file>Static/hovered_saveas.png</file>
+	<file>Static/hovered_save.png</file>
+    </qresource>
+</RCC>
