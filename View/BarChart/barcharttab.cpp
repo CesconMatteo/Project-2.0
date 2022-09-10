@@ -46,7 +46,7 @@ void BarChartTab::setupScroll (Chart* chart) {
     QVBoxLayout* dataLayout = new QVBoxLayout();
 
     firstColoumn = QList<QList<QWidget*>>();
-    secondColoumn = QList<QList<QLineEdit*>>();
+    secondColoumn = QList<QList<QWidget*>>();
 
     for (auto it = chart->begin(); it != chart->end(); it++) {
 
@@ -57,6 +57,7 @@ void BarChartTab::setupScroll (Chart* chart) {
         font.setBold(true);
         font.setPointSize(20);
         setName->setFont(font);
+        setName->setFixedWidth(150);
         setName->setAlignment(Qt::AlignCenter);
         setLayout->addWidget(setName);
         chartDataNames.push_back(setName);
@@ -68,7 +69,7 @@ void BarChartTab::setupScroll (Chart* chart) {
 
         QVBoxLayout* externalLayout = new QVBoxLayout();
         QList<QWidget*> tmpFC = QList<QWidget*>();
-        QList<QLineEdit*> tmpSC = QList<QLineEdit*>();
+        QList<QWidget*> tmpSC = QList<QWidget*>();
         QList<QPushButton*> tmpBtn = QList<QPushButton*>();
 
         for (int i = 0; i < static_cast<BarChart*>(chart)->categories().size(); i++) {
@@ -122,9 +123,12 @@ void BarChartTab::setupScroll (Chart* chart) {
     /* SET UP SCROLL */
     QWidget* scrollWidget = new QWidget();
     scrollWidget->setLayout(dataLayout);
+    scrollWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     scroll = new QScrollArea();
     scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    scroll->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    scroll->setSizeAdjustPolicy(QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents);
     scroll->setWidget(scrollWidget);
 }
 
@@ -170,10 +174,10 @@ void BarChartTab::resizeAxis() {
     double min = std::numeric_limits<double>::max();
     for (auto& i: secondColoumn) {
         for (auto j: i) {
-            if (j->text().toDouble() > max)
-                max = j->text().toDouble();
-            if (j->text().toDouble() < min)
-                min = j->text().toDouble();
+            if (static_cast<QLineEdit*>(j)->text().toDouble() > max)
+                max = static_cast<QLineEdit*>(j)->text().toDouble();
+            if (static_cast<QLineEdit*>(j)->text().toDouble() < min)
+                min = static_cast<QLineEdit*>(j)->text().toDouble();
         }
     }
     static_cast<QValueAxis*>(chartView->chart()->axes(Qt::Vertical).at(0))->setRange(min,max);
@@ -234,13 +238,14 @@ void BarChartTab::addChartData(const QStringList& info) {
         newBarSeries->append(barset);
 
         QHBoxLayout* setLayout = new QHBoxLayout();
+
         QLabel* setName = new QLabel(info.at(0));
-        setLayout->addWidget(setName);
         QFont font = setName->font();
         font.setBold(true);
-        font.setPointSize(20);
-        setName->setAlignment(Qt::AlignCenter);
         setName->setFont(font);
+        font.setPointSize(20);
+        setName->setFixedWidth(150);
+        setName->setAlignment(Qt::AlignCenter);
         setLayout->addWidget(setName);
         chartDataNames.push_back(setName);
 
@@ -251,7 +256,7 @@ void BarChartTab::addChartData(const QStringList& info) {
         QVBoxLayout* externalLayout = new QVBoxLayout();
         externalLayout->addLayout(setLayout);
         QList<QWidget*> tmpFC = QList<QWidget*>();
-        QList<QLineEdit*> tmpSC = QList<QLineEdit*>();
+        QList<QWidget*> tmpSC = QList<QWidget*>();
         QList<QPushButton*> tmpBtn = QList<QPushButton*>();
 
         for (int i=0; i < categories.size(); i++) {

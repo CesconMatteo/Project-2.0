@@ -48,6 +48,7 @@ void PieChartTab::setupScroll (Chart* chart) {
         QFont font = sliceName->font();
         font.setBold(true);
         font.setPointSize(20);
+        sliceName->setMaximumWidth(100);
         sliceName->setFont(font);
         sliceName->setAlignment(Qt::AlignCenter);
         firstLayout->addWidget(sliceName);
@@ -77,7 +78,7 @@ void PieChartTab::setupScroll (Chart* chart) {
         QLineEdit* percEdit = new QLineEdit();
         percEdit->setAlignment(Qt::AlignCenter);
         secondLayout->addWidget(percEdit);
-        QList<QLineEdit*> tmpSC = QList<QLineEdit*>();
+        QList<QWidget*> tmpSC = QList<QWidget*>();
         tmpSC.push_back(percEdit);
         secondColoumn.push_back(tmpSC);
 
@@ -101,6 +102,8 @@ void PieChartTab::setupScroll (Chart* chart) {
     scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     scroll->setWidget(scrollWidget);
+    scroll->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    scroll->setSizeAdjustPolicy(QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents);
 }
 
 void PieChartTab::dxLayout (Chart* chart) {
@@ -146,7 +149,7 @@ void PieChartTab::updatePercentage() {
             value.precision(1);
         value << std::fixed;
         value << slices.at(i)->percentage() * 100;
-        secondColoumn.at(i).at(0)->setText(QString::fromStdString(value.str()));
+        static_cast<QLineEdit*>(secondColoumn.at(i).at(0))->setText(QString::fromStdString(value.str()));
     }
 
     for (int i=0; i < chartDataNames.size(); i++) {
@@ -195,6 +198,7 @@ void PieChartTab::addChartData(const QStringList& info) {
         font.setBold(true);
         font.setPointSize(20);
         label->setFont(font);
+        label->setMaximumWidth(100);
         label->setAlignment(Qt::AlignCenter);
         firstLayout->addWidget(label);
         chartDataNames.push_back(label);
@@ -219,7 +223,7 @@ void PieChartTab::addChartData(const QStringList& info) {
 
         QLineEdit* percEdit = new QLineEdit();
         percEdit->setAlignment(Qt::AlignCenter);
-        QList<QLineEdit*> tmp2 = QList<QLineEdit*>();
+        QList<QWidget*> tmp2 = QList<QWidget*>();
         tmp2.push_back(percEdit);
         secondColoumn.push_back(tmp2);
         secondLayout->addWidget(percEdit);
@@ -251,6 +255,7 @@ void PieChartTab::addChartData(const QStringList& info) {
         static_cast<QVBoxLayout*>(layout())->addLayout(horizontalLayout);
         delete x;
         voidChart = false;
+        updatePercentage();
     }
 }
 

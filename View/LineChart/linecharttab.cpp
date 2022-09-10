@@ -38,6 +38,9 @@ void LineChartTab::setupScroll (Chart* chart) {
 
     QVBoxLayout* dataLayout = new QVBoxLayout();
 
+    firstColoumn = QList<QList<QWidget*>>();
+    secondColoumn = QList<QList<QWidget*>>();
+
     for (auto it = chart->begin(); it != chart->end(); it++) {
 
         /* LINE NAME LAYOUT */
@@ -47,6 +50,7 @@ void LineChartTab::setupScroll (Chart* chart) {
         font.setBold(true);
         font.setPointSize(20);
         label->setFont(font);
+        label->setFixedWidth(150);
         label->setAlignment(Qt::AlignCenter);
         lineNameLayout->addWidget(label);
         chartDataNames.push_back(label);
@@ -58,7 +62,7 @@ void LineChartTab::setupScroll (Chart* chart) {
 
         QVBoxLayout* externalLayout = new QVBoxLayout();
         QList<QWidget*> tmpFC = QList<QWidget*>();
-        QList<QLineEdit*> tmpSC = QList<QLineEdit*>();
+        QList<QWidget*> tmpSC = QList<QWidget*>();
         QList<QPushButton*> tmpBtn = QList<QPushButton*>();
 
         for (auto it2 = static_cast<Line*>(*it)->begin(); it2 != static_cast<Line*>(*it)->end(); it2++) {
@@ -74,7 +78,6 @@ void LineChartTab::setupScroll (Chart* chart) {
             x << (*it2).first;
             QLineEdit* xEdit = new QLineEdit(QString::fromStdString(x.str()));
             xEdit->setAlignment(Qt::AlignCenter);
-            xEdit->setFixedWidth(width() * 0.15);
             internalLayout->addWidget(xEdit);
             tmpFC.push_back(xEdit);
 
@@ -88,13 +91,11 @@ void LineChartTab::setupScroll (Chart* chart) {
             y << (*it2).second;
             QLineEdit* yEdit = new QLineEdit(QString::fromStdString(y.str()));
             yEdit->setAlignment(Qt::AlignCenter);
-            yEdit->setFixedWidth(width() * 0.15);
             internalLayout->addWidget(yEdit);
             tmpSC.push_back(yEdit);
 
             /* BUTTON */
             QPushButton* btn = new QPushButton("···");
-            btn->setFixedWidth(25);
             internalLayout->addWidget(btn);
             tmpBtn.push_back(btn);
 
@@ -120,6 +121,8 @@ void LineChartTab::setupScroll (Chart* chart) {
     scroll = new QScrollArea();
     scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    scroll->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    scroll->setSizeAdjustPolicy(QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents);    
     scroll->setWidget(scrollWidget);
 }
 
@@ -185,6 +188,8 @@ void LineChartTab::addChartData(const QStringList& info) {
         font.setBold(true);
         font.setPointSize(20);
         label->setFont(font);
+        label->setFixedWidth(150);
+        label->setAlignment(Qt::AlignCenter);
         internalLayout->addWidget(label);
         chartDataNames.push_back(label);
 
@@ -199,7 +204,7 @@ void LineChartTab::addChartData(const QStringList& info) {
         chartDataSeparators.push_back(separator);
 
         firstColoumn.push_back(QList<QWidget*>());
-        secondColoumn.push_back(QList<QLineEdit*>());
+        secondColoumn.push_back(QList<QWidget*>());
         subOptionButtons.push_back(QList<QPushButton*>());
 
         static_cast<QVBoxLayout*>(scroll->widget()->layout())->addLayout(newLayout);

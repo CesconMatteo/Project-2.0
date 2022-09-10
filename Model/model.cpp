@@ -124,8 +124,6 @@ void Model::addChartData (const int& i, const QStringList& info) {          // I
 
 bool Model::removeChartData (const int& i, const QString& chartDataName) {
     for (auto it = charts.at(i)->begin(); it != charts.at(i)->end(); it++) {
-        QString a = (*it)->getName();
-        double s = static_cast<PieSlice*>(*it)->getValue();
         if ((*it)->getName() == chartDataName) {
             charts.at(i)->erase(it);
             saved[i] = false;

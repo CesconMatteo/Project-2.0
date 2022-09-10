@@ -17,8 +17,7 @@ void ChartTab::zeroDataTab (const QString& string) {
 }
 
 void ChartTab::resizeEvent(QResizeEvent*) {
-    //if (!voidChart)
-        //scroll->setFixedWidth(chartDataOptionButtons.at(0)->geometry().topRight().x() + (scroll->verticalScrollBar()->width() * 2));
+
 }
 
 QPushButton* ChartTab::getNewChartDataBtn() const {

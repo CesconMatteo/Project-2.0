@@ -273,7 +273,6 @@ QStringList MainWidget::addChartData() {
     QStringList tmp = static_cast<ChartTab*>(tab->currentWidget())->addChartDataDialog();
     if (!tmp.isEmpty()) {
         static_cast<ChartTab*>(tab->currentWidget())->addChartData(tmp);
-        tab->currentWidget()->resize(width(),height());
         QPushButton* btn = static_cast<ChartTab*>(tab->currentWidget())->getChartDataOptionButtons().last();
         connect (btn, SIGNAL(clicked()), controller, SLOT(chartDataOptions()));
     }

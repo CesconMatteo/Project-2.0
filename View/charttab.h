@@ -36,7 +36,7 @@ protected:
     QScrollArea* scroll;
 
     QList<QList<QWidget*>> firstColoumn;        // SUBCHARTDATA FIRST COLOUMN
-    QList<QList<QLineEdit*>> secondColoumn;     // SUBCHARTDATA SECOND COLOUMN
+    QList<QList<QWidget*>> secondColoumn;     // SUBCHARTDATA SECOND COLOUMN
     QList<QList<QPushButton*>> subOptionButtons;   // SUBCHARTDATA OPTION BUTTONS
 
     bool voidChart;
@@ -46,7 +46,7 @@ protected:
     void zeroDataTab (const QString&);
     QLabel* zeroDataLabel;
 private:
-    void resizeEvent (QResizeEvent*) final;
+    void resizeEvent(QResizeEvent*) final;
 };
 
 #endif
