@@ -12,11 +12,17 @@
 class BarChartTab: public ChartTab {
 public:
     BarChartTab(Chart*, QWidget* =nullptr);
+    void addChartData (const QStringList&) final;
+    QStringList addChartDataDialog() final;
     bool delChartData (const QString&) final;
+    QPair<QString,QString> modChartData (const QString&) final;
 private:
+    QStringList categories;
+
     QHBoxLayout* header();
     void setupScroll (Chart*);
-    QChartView* dxLayout (Chart*);
+    void dxLayout (Chart*);
+    void resizeAxis();
 };
 
 #endif

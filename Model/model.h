@@ -38,7 +38,7 @@ public:
     /* CHARTDATA RELATED */
     void addChartData (const int&, const QStringList&);
     bool removeChartData (const int&, const QString&);
-    void modifyChartData (const int&, const int&, const QStringList&);
+    void modifyChartData (const int&, const QString&, const QString&, const double& =0);
 
     /* ELEMENTS OF CHARTDATA */
     /* AGGIUNTA DI UN PUNTO/ SINGOLO DOUBLE */

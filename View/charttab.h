@@ -12,8 +12,16 @@ public:
     QPushButton* getNewChartDataBtn() const;
     QPushButton* getDelChartDataBtn() const;
 
+    virtual QStringList addChartDataDialog() =0;
+    virtual void addChartData (const QStringList&) =0;
     QString delChartDataDialog();
     virtual bool delChartData (const QString&) =0;
+    virtual QPair<QString,QString> showChartDataOptions (QPushButton*);
+    virtual QPair<QString,QString> modChartData (const QString&) =0;
+
+    void exportPDF (const QString&);
+
+    const QList<QPushButton*>& getChartDataOptionButtons() const;
 
 protected:
 
@@ -35,7 +43,8 @@ protected:
 
 
     QFrame* createSeparator();
-    static QHBoxLayout* zeroDataTab (const QString&);
+    void zeroDataTab (const QString&);
+    QLabel* zeroDataLabel;
 private:
     void resizeEvent (QResizeEvent*) final;
 };

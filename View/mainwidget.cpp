@@ -1,4 +1,4 @@
-#include "mainwidget.h"
+﻿#include "mainwidget.h"
 
 #include "Control/controller.h"
 #include "charttab.h"
@@ -60,13 +60,13 @@ QHBoxLayout* MainWidget::buttons() {
     newFileBtn->setIcon(QIcon(QPixmap(":/Static/newfile.png")));
     saveFileBtn->setIcon(QIcon(QPixmap(":/Static/save.png")));
     saveAsBtn->setIcon(QIcon(QPixmap(":/Static/saveas.png")));
-    exportPDFBtn->setText("Esporta come PDF");
+    exportPDFBtn->setIcon(QIcon(QPixmap(":/Static/savePDF.png")));
 
-    openFileBtn->setIconSize(QSize(height() * 0.04, height() * 0.04));
-    newFileBtn->setIconSize(QSize(height() * 0.04, height() * 0.04));
-    saveFileBtn->setIconSize(QSize(height() * 0.04, height() * 0.04));
-    saveAsBtn->setIconSize(QSize(height() * 0.04, height() * 0.04));
-    exportPDFBtn->setIconSize(QSize(height() * 0.04, height() * 0.04));
+    openFileBtn->setIconSize(QSize(height() * 0.06, height() * 0.06));
+    newFileBtn->setIconSize(QSize(height() * 0.06, height() * 0.06));
+    saveFileBtn->setIconSize(QSize(height() * 0.06, height() * 0.06));
+    saveAsBtn->setIconSize(QSize(height() * 0.06, height() * 0.06));
+    exportPDFBtn->setIconSize(QSize(height() * 0.06, height() * 0.06));
 
     openFileBtn->setStyleSheet("border:0px;");
     newFileBtn->setStyleSheet("border:0px;");
@@ -102,6 +102,8 @@ bool MainWidget::eventFilter (QObject* object, QEvent* event) {
             newFileBtn->setIcon(QIcon(QPixmap(":/Static/hovered_newfile.png")));
         else if (obj == openFileBtn)
             openFileBtn->setIcon(QIcon(QPixmap(":/Static/hovered_openfile.png")));
+        else if (obj == exportPDFBtn)
+            exportPDFBtn->setIcon(QIcon(QPixmap(":/Static/hovered_savePDF.png")));
     } else if (event->type() == QEvent::Leave) {
         if (obj == saveFileBtn)
             saveFileBtn->setIcon(QIcon(QPixmap(":/Static/save.png")));
@@ -111,6 +113,8 @@ bool MainWidget::eventFilter (QObject* object, QEvent* event) {
             newFileBtn->setIcon(QIcon(QPixmap(":/Static/newfile.png")));
         else if (obj == openFileBtn)
             openFileBtn->setIcon(QIcon(QPixmap(":/Static/openfile.png")));
+        else if (obj == exportPDFBtn)
+            exportPDFBtn->setIcon(QIcon(QPixmap(":/Static/savePDF.png")));
     }
     return false;
 }
@@ -124,7 +128,7 @@ void MainWidget::setController (Controller* _controller) {
 /* CONNECTION SIGNAL-SLOTS */
 void MainWidget::connectButtons() {
     connect (this, SIGNAL(fileDropped(QString)), controller, SLOT(openFile(QString)));
-    connect (this, SIGNAL(closing()), controller, SLOT(checkAllFilesSaved()));
+    connect (this, SIGNAL(closing(QCloseEvent*)), controller, SLOT(checkAllFilesSaved(QCloseEvent*)));
 
     connect (tab, SIGNAL(tabCloseRequested(int)), controller, SLOT(closeTab(int)));
 
@@ -132,6 +136,7 @@ void MainWidget::connectButtons() {
     connect (saveFileBtn, SIGNAL(clicked()), controller, SLOT(saveFile()));
     connect (saveAsBtn, SIGNAL(clicked()), controller, SLOT(saveAs()));
     connect (newFileBtn, SIGNAL(clicked()), controller, SLOT(newFile()));
+    connect (exportPDFBtn, SIGNAL(clicked()), controller, SLOT(exportPDF()));
 }
 
 // ADDS A CHARTTAB
@@ -165,6 +170,7 @@ void MainWidget::addNewTab(Chart* x) {
         tab->setTabsClosable(true);
         _tabsOpened = true;
     }
+    connectChartDataButtons();
 }
 
 /* DRAG AND DROP */
@@ -195,7 +201,7 @@ QString MainWidget::openFileDialog (const QString& folder) {
 
 // ASK IF YOU WANT TO SAVE OR NOT BEFORE CLOSING
 SaveOptions MainWidget::fileNotSavedDialog() {
-    QMessageBox::StandardButton reply = QMessageBox::question (this, "Salvare?", "File non salvato, chiudere lo stesso?", QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+    QMessageBox::StandardButton reply = QMessageBox::question (this, "Salvare?", "File non salvato, salvare?", QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
     switch (reply) {
         case QMessageBox::Yes:
             return SaveOptions::Save;
@@ -210,7 +216,7 @@ SaveOptions MainWidget::fileNotSavedDialog() {
 
 // GET WHERE TO SAVE A CHART WITH A FILE THAT DOESNT EXISTS
 QString MainWidget::savePathDialog (const QString& folder) {
-    return QFileDialog::getSaveFileName(this, "Salva come", folder, "JSON files(*.json)");
+    return QFileDialog::getSaveFileName(this, "Salva in", folder, "JSON files(*.json)");
 }
 
 bool MainWidget::yesOrNoDialog (const QString& msg) {
@@ -258,15 +264,44 @@ void MainWidget::updatePath (const QString& newPath) {
     tab->setTabText(tab->currentIndex(), title);
 }
 
-void MainWidget::closeEvent (QCloseEvent* ) {
-    emit closing();
+void MainWidget::closeEvent (QCloseEvent* e) {
+    emit closing(e);
 }
 
 /* RIMBALZO CHIAMATE */
+QStringList MainWidget::addChartData() {
+    QStringList tmp = static_cast<ChartTab*>(tab->currentWidget())->addChartDataDialog();
+    if (!tmp.isEmpty()) {
+        static_cast<ChartTab*>(tab->currentWidget())->addChartData(tmp);
+        tab->currentWidget()->resize(width(),height());
+        QPushButton* btn = static_cast<ChartTab*>(tab->currentWidget())->getChartDataOptionButtons().last();
+        connect (btn, SIGNAL(clicked()), controller, SLOT(chartDataOptions()));
+    }
+    return tmp;
+}
+
+void MainWidget::connectChartDataButtons() {
+    QList<QPushButton*> buttons = (static_cast<ChartTab*>(tab->currentWidget())->getChartDataOptionButtons());
+    for (auto i: buttons)
+        connect (i, SIGNAL(clicked()), controller, SLOT(chartDataOptions()));
+}
+
 QString MainWidget::delChartDataDialog() {
     return static_cast<ChartTab*>(tab->currentWidget())->delChartDataDialog();
 }
 
 bool MainWidget::delChartData (const QString& chartDataName) {
     return static_cast<ChartTab*>(tab->currentWidget())->delChartData(chartDataName);
+}
+
+QPair<QString,QString> MainWidget::modChartData(const QString& chartDataName) {
+    return static_cast<ChartTab*>(tab->currentWidget())->modChartData(chartDataName);
+}
+
+void MainWidget::exportPDF (const QString& folder) {
+    static_cast<ChartTab*>(tab->currentWidget())->exportPDF(folder);
+}
+
+QPair<QString,QString> MainWidget::showChartDataOptionsMenu (QPushButton* sender) {
+    return static_cast<ChartTab*>(tab->currentWidget())->showChartDataOptions(sender);
 }

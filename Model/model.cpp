@@ -104,18 +104,28 @@ void Model::removeChart(const int& i) {
     saved.removeAt(i);
 }
 
-void Model::addChartData (const int& i, const QStringList& info) {
-    if (dynamic_cast<BarChart*>(charts.at(i)))
-        charts.at(i)->push_back(new BarSet(info.at(0)));
-    else if (dynamic_cast<LineChart*>(charts.at(i)))
+void Model::addChartData (const int& i, const QStringList& info) {          // INFO CONTIENE NEL PRIMO CAMPO IL NOME
+                                                                            // PER BARCHART CONTIENE ANCHE I VALORI, IN CASO DI NON INSERIMENTO
+    if (dynamic_cast<BarChart*>(charts.at(i))) {                            // CONTIENE 0
+                                                                            // PER PIECHART CONTIENE ANCHE IL VALORE DELLA FETTA
+        BarSet* newBarSet = new BarSet(info.at(0));
+        for (int j=1; j < info.size(); j++)
+            newBarSet->push_back(info.at(j).toDouble());
+        charts.at(i)->push_back(newBarSet);
+
+    } else if (dynamic_cast<LineChart*>(charts.at(i)))
         charts.at(i)->push_back(new class Line(info.at(0)));
+
     else if (dynamic_cast<PieChart*>(charts.at(i)))
         charts.at(i)->push_back(new PieSlice(info.at(0), info.at(1).toDouble()));
+
     saved[i] = false;
 }
 
 bool Model::removeChartData (const int& i, const QString& chartDataName) {
     for (auto it = charts.at(i)->begin(); it != charts.at(i)->end(); it++) {
+        QString a = (*it)->getName();
+        double s = static_cast<PieSlice*>(*it)->getValue();
         if ((*it)->getName() == chartDataName) {
             charts.at(i)->erase(it);
             saved[i] = false;
@@ -125,24 +135,27 @@ bool Model::removeChartData (const int& i, const QString& chartDataName) {
     return false;
 }
 
-void Model::modifyChartData(const int& i, const int& dataIndex, const QStringList& info) {
-    if (dynamic_cast<BarChart*>(charts.at(i))) {
-        BarSet* x = new BarSet (info.at(0));
-        const BarSet* old = static_cast<const BarSet*>(charts.at(i)->at(dataIndex));
-        for (auto it = old->cbegin(); it != old->cend(); it++)
-            x->push_back(*it);
-        charts.at(i)->replace(dataIndex, x);
-    } else if (dynamic_cast<LineChart*>(charts.at(i))) {
-        class Line* x = new class Line (info.at(0));
-        const class Line* old = static_cast<const class Line*>(charts.at(i)->at(dataIndex));
-        for (auto it = old->cbegin(); it != old->cend(); it++)
-            x->push_back(*it);
-        charts.at(i)->replace(dataIndex, x);
-    } else if (dynamic_cast<PieChart*>(charts.at(i))) {
-        PieSlice* x = new PieSlice (info.at(0), info.at(1).toDouble());
-        charts.at(i)->replace(dataIndex, x);
+void Model::modifyChartData (const int& i, const QString& oldName, const QString& newName, const double& newValue) {
+    bool done = false;
+    if (dynamic_cast<PieChart*>(charts.at(i))) {
+
+        for (auto it = charts.at(i)->begin(); it != charts.at(i)->end(); it++)
+            if ((*it)->getName() == oldName) {
+                (*it)->setName(newName);
+                static_cast<PieSlice*>(*it)->setValue(newValue);
+                done = true;
+                break;
+            }
+    } else {
+        for (auto it = charts.at(i)->begin(); it != charts.at(i)->end(); it++)
+            if ((*it)->getName() == oldName) {
+                (*it)->setName(newName);
+                done = true;
+                break;
+            }
     }
-    saved[i] = false;
+    if (done)
+        saved[i] = false;
 }
 
 Chart* Model::last() {

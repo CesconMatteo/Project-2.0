@@ -5,6 +5,7 @@
 #include "View/mainwidget.h"
 
 #include <QObject>
+#include <QCloseEvent>
 
 class Controller : public QObject {
     Q_OBJECT
@@ -20,9 +21,12 @@ public slots:
     void saveAs();
     void newFile();
     void closeTab (int);
-    void checkAllFilesSaved();
+    void checkAllFilesSaved(QCloseEvent*);
     void newChartData();
-    void delChartData();
+    void chartDataOptions();
+    void delChartData(QString =0);
+    void modChartData (const QString&);
+    void exportPDF();
 };
 
 #endif

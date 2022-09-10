@@ -63,12 +63,17 @@ public:
     void closeEvent (QCloseEvent*);
 
     /* RIMBALZO CHIAMATE */
+    QStringList addChartData();
+    void connectChartDataButtons();
     QString delChartDataDialog();
     bool delChartData (const QString&);
+    QPair<QString,QString> modChartData (const QString&);
+    void exportPDF (const QString&);
+    QPair<QString,QString> showChartDataOptionsMenu (QPushButton*);
 
 signals:
     QString fileDropped(QString);
-    void closing();
+    void closing(QCloseEvent*);
 };
 
 #endif

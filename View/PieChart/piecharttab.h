@@ -15,12 +15,15 @@ class PieChartTab: public ChartTab {
     Q_OBJECT
 public:
     PieChartTab(Chart*, QWidget* =nullptr);
+    void addChartData (const QStringList&);
+    QStringList addChartDataDialog() final;
     bool delChartData (const QString&) final;
+    QPair<QString,QString> modChartData (const QString&) final;
 private:
 
     QHBoxLayout* header();
     void setupScroll (Chart*);
-    QChartView* dxLayout (Chart*);
+    void dxLayout (Chart*);
     void updatePercentage();
 private slots:
     void explodeSlice (bool);

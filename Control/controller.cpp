@@ -83,20 +83,25 @@ void Controller::newFile() {
     view->addNewTab(model->last());
 }
 
-void Controller::checkAllFilesSaved() {
+void Controller::checkAllFilesSaved (QCloseEvent* e) {
     if (!model->allSaved())         // SE NON SONO TUTTI SALVATI
-        view->yesOrNoDialog("Non tutti i file sono stati salvati. Chiudere lo stesso?");
-}
-#include <iostream>
-using namespace std;
-void Controller::newChartData() {
-    cout << "New";
+        if (!view->yesOrNoDialog("Non tutti i file sono stati salvati. Chiudere lo stesso?"))
+            e->ignore();
 }
 
-void Controller::delChartData() {
-    QString chartDataName = view->delChartDataDialog();
-    if (chartDataName.isEmpty())                    // SCHIACCIO CANCEL SUL DIALOG
+void Controller::newChartData() {
+    QStringList info = view->addChartData();
+    if (info.isEmpty())
         return;
+    model->addChartData(view->currentTabIndex(), info);
+}
+
+void Controller::delChartData (QString chartDataName) {
+    if (chartDataName.isEmpty()) {
+        chartDataName = view->delChartDataDialog();
+        if (chartDataName.isEmpty())                    // SCHIACCIO CANCEL SUL DIALOG
+            return;
+    }
     if (model->removeChartData(view->currentTabIndex(), chartDataName))         // RIMOZIONE CORRETTA DAL MODEL
         if (view->delChartData(chartDataName))                                  // RIMOZIONE CORRETTA DAL VIEW
             view->okDialog("Rimozione corretta");
@@ -104,4 +109,26 @@ void Controller::delChartData() {
             view->errorDialog("Rimozione errata");
     else
         view->errorDialog("Errore!");
+}
+
+/* INFO.SECOND E' IL NOME DEL CHARTDATA */
+void Controller::chartDataOptions() {
+    QPair<QString,QString> info = view->showChartDataOptionsMenu(static_cast<QPushButton*>(QObject::sender()));
+    if (info.first == "Modifica") {
+        QString a = info.second;
+        modChartData(info.second);
+    } else if (info.first == "Nuovo punto") {
+
+    } else if (info.first == "Elimina")
+        delChartData(info.second);
+}
+
+void Controller::modChartData (const QString& chartDataName) {
+
+    QPair<QString,QString> newData = view->modChartData(chartDataName);
+    model->modifyChartData(view->currentTabIndex(), chartDataName, newData.first, newData.second.toDouble());
+}
+
+void Controller::exportPDF() {
+    view->exportPDF(model->getDesktopPath());
 }

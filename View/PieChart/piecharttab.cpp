@@ -1,5 +1,6 @@
 #include "piecharttab.h"
 
+#include "Model/PieChart/piechart.h"
 #include "Model/PieChart/pieslice.h"
 
 PieChartTab::PieChartTab(Chart* chart, QWidget* parent) : ChartTab(parent) {
@@ -7,13 +8,15 @@ PieChartTab::PieChartTab(Chart* chart, QWidget* parent) : ChartTab(parent) {
     macroLayout->addLayout(header());
 
     if (chart->empty()) {
-        macroLayout->addLayout(zeroDataTab("Inserire una fetta"));
+        zeroDataTab("Inserire una fetta");
+        macroLayout->addWidget(zeroDataLabel);
         voidChart = true;
     } else {
         QHBoxLayout* horizontalLayout = new QHBoxLayout();
         setupScroll(chart);
         horizontalLayout->addWidget(scroll);
-        horizontalLayout->addWidget(dxLayout(chart));
+        dxLayout(chart);
+        horizontalLayout->addWidget(chartView);
         updatePercentage();
         macroLayout->addLayout(horizontalLayout);
         voidChart = false;
@@ -46,15 +49,14 @@ void PieChartTab::setupScroll (Chart* chart) {
         font.setBold(true);
         font.setPointSize(20);
         sliceName->setFont(font);
+        sliceName->setAlignment(Qt::AlignCenter);
         firstLayout->addWidget(sliceName);
         chartDataNames.push_back(sliceName);
 
         /* BUTTON */
         QPushButton* btn = new QPushButton("Opzioni");
         firstLayout->addWidget(btn);
-        QList<QPushButton*> tmp = QList<QPushButton*>();
-        tmp.push_back(btn);
-        subOptionButtons.push_back(tmp);
+        chartDataOptionButtons.push_back(btn);
 
         QHBoxLayout* secondLayout = new QHBoxLayout();
 
@@ -90,14 +92,18 @@ void PieChartTab::setupScroll (Chart* chart) {
         dataLayout->addWidget(separator);
     }
 
+    dataLayout->setSizeConstraint(QLayout::SetFixedSize);
+
     /* SET UP SCROLL */
     QWidget* scrollWidget = new QWidget();
     scrollWidget->setLayout(dataLayout);
     scroll = new QScrollArea();
+    scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     scroll->setWidget(scrollWidget);
 }
 
-QChartView* PieChartTab::dxLayout (Chart* chart) {
+void PieChartTab::dxLayout (Chart* chart) {
 
     QPieSeries* series = new QPieSeries();
 
@@ -118,7 +124,6 @@ QChartView* PieChartTab::dxLayout (Chart* chart) {
 
     chartView = new QChartView(graphicChart);
     chartView->setRenderHint(QPainter::Antialiasing);
-    return chartView;
 }
 
 void PieChartTab::explodeSlice(bool what) {
@@ -144,12 +149,111 @@ void PieChartTab::updatePercentage() {
         secondColoumn.at(i).at(0)->setText(QString::fromStdString(value.str()));
     }
 
-    for (auto i: static_cast<QPieSeries*>(chartView->chart()->series().at(0))->slices()) {
-        QString str = QString::fromStdString(i->label().toStdString().substr(0, i->label().toStdString().find(' ')+1));
-        i->setLabel(str.append(QString::number(i->percentage() * 100, 'f', 1)).append("%"));
+    for (int i=0; i < chartDataNames.size(); i++) {
+        QPieSlice* slice = static_cast<QPieSeries*>(chartView->chart()->series().at(0))->slices().at(i);
+        slice->setLabel(chartDataNames.at(i)->text().append(" ").append(QString::number(slice->percentage() * 100, 'f', 1)).append("%"));
     }
 
 }
+
+QStringList PieChartTab::addChartDataDialog() {
+    QDialog dialogWindow(this);
+    dialogWindow.setWindowTitle("Nuova fetta");
+    QFormLayout* layout = new QFormLayout();
+    QLineEdit* name = new QLineEdit();
+    QLineEdit* value = new QLineEdit();
+    value->setValidator(new QRegularExpressionValidator(QRegularExpression("[+-]?([0-9]*[.])?[0-9]+")));
+    layout->addRow("Nome", name);
+    layout->addRow("Valore", value);
+    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialogWindow);
+    connect(&buttonBox, SIGNAL(accepted()), &dialogWindow, SLOT(accept()));
+    connect(&buttonBox, SIGNAL(rejected()), &dialogWindow, SLOT(reject()));
+    layout->addRow(&buttonBox);
+    dialogWindow.setLayout(layout);
+    name->setFocus();
+    QStringList results = QStringList();
+    if (dialogWindow.exec() == QDialog::Accepted) {
+        results.push_back(name->text());
+        results.push_back(value->text());
+    }
+    return results;
+}
+
+void PieChartTab::addChartData(const QStringList& info) {
+
+    if (!voidChart) {
+        QPieSlice* slice = new QPieSlice(info.at(0) + " ", info.at(1).toDouble());
+        connect (slice, SIGNAL(hovered(bool)), this, SLOT(explodeSlice(bool)));
+        static_cast<QPieSeries*>(chartView->chart()->series().at(0))->append(slice);
+
+        QVBoxLayout* newLayout = new QVBoxLayout();
+        QHBoxLayout* firstLayout = new QHBoxLayout();
+        QHBoxLayout* secondLayout = new QHBoxLayout();
+
+        QLabel* label = new QLabel(info.at(0));
+        QFont font = label->font();
+        font.setBold(true);
+        font.setPointSize(20);
+        label->setFont(font);
+        label->setAlignment(Qt::AlignCenter);
+        firstLayout->addWidget(label);
+        chartDataNames.push_back(label);
+
+        QPushButton* setOptionBtn = new QPushButton("Opzioni");         // ADD BUTTON
+        firstLayout->addWidget(setOptionBtn);
+        chartDataOptionButtons.push_back(setOptionBtn);
+
+        std::stringstream value;
+        if (fmod(info.at(1).toDouble(), 1.0) == 0)
+            value.precision(0);
+        else
+            value.precision(2);
+        value << std::fixed;
+        value << info.at(1).toDouble();
+        QLineEdit* valueEdit = new QLineEdit(QString::fromStdString(value.str()));
+        valueEdit->setAlignment(Qt::AlignCenter);
+        secondLayout->addWidget(valueEdit);
+        QList<QWidget*> tmpFC = QList<QWidget*>();
+        tmpFC.push_back(valueEdit);
+        firstColoumn.push_back(tmpFC);
+
+        QLineEdit* percEdit = new QLineEdit();
+        percEdit->setAlignment(Qt::AlignCenter);
+        QList<QLineEdit*> tmp2 = QList<QLineEdit*>();
+        tmp2.push_back(percEdit);
+        secondColoumn.push_back(tmp2);
+        secondLayout->addWidget(percEdit);
+
+        newLayout->addLayout(firstLayout);
+        newLayout->addLayout(secondLayout);
+
+        QFrame* separator = createSeparator();
+        newLayout->addWidget(separator);
+        chartDataSeparators.push_back(separator);
+
+        static_cast<QVBoxLayout*>(scroll->widget()->layout())->addLayout(newLayout);
+
+        updatePercentage();
+
+    } else {
+
+        PieChart* x = new PieChart();
+        PieSlice* y = new PieSlice(info.at(0), info.at(1).toDouble());
+        x->push_back(y);
+
+        QHBoxLayout* horizontalLayout = new QHBoxLayout();
+        setupScroll(x);
+        horizontalLayout->addWidget(scroll);
+        dxLayout(x);
+        horizontalLayout->addWidget(chartView);
+        delete zeroDataLabel;
+        zeroDataLabel = nullptr;
+        static_cast<QVBoxLayout*>(layout())->addLayout(horizontalLayout);
+        delete x;
+        voidChart = false;
+    }
+}
+
 
 bool PieChartTab::delChartData (const QString& sliceName) {
 
@@ -168,28 +272,81 @@ bool PieChartTab::delChartData (const QString& sliceName) {
 
     if (k != -1) {
 
-        /* RESIZE SCROLL */
-        int y1 = chartDataNames.at(k)->geometry().topLeft().y();
-        int y2 = firstColoumn.at(k).at(firstColoumn.at(k).size()-1)->geometry().bottomLeft().y();
-        scroll->widget()->setFixedHeight(scroll->widget()->height()-(y2-y1+chartDataSeparators.at(k)->height()));
-
-        for (int i=0; i < subOptionButtons.at(k).size(); i++) {
-            delete firstColoumn.at(k).at(i);
-            delete secondColoumn.at(k).at(i);
-            delete subOptionButtons.at(k).at(i);
-        }
+        delete firstColoumn.at(k).at(0);
+        delete secondColoumn.at(k).at(0);
+        delete chartDataOptionButtons.at(k);
         delete chartDataNames.at(k);
         delete chartDataSeparators.at(k);
 
         firstColoumn.removeAt(k);
         secondColoumn.removeAt(k);
-        subOptionButtons.removeAt(k);
+        chartDataOptionButtons.removeAt(k);
         chartDataNames.removeAt(k);
         chartDataSeparators.removeAt(k);
 
         updatePercentage();
 
+        /* CONTROLLO SE E' VUOTO */
+        if (firstColoumn.size() == 0) {
+            voidChart = true;
+            delete scroll;
+            delete chartView;
+
+            zeroDataTab("Inserire una fetta");
+            static_cast<QVBoxLayout*>(layout())->addWidget(zeroDataLabel);
+        }
+
         return true;
     }
     return false;
 }
+
+QPair<QString, QString> PieChartTab::modChartData(const QString& chartDataName) {
+
+    int k = -1;
+    for (int i=0; i < chartDataNames.size(); i++)
+        if (chartDataNames.at(i)->text() == chartDataName)
+            k=i;
+
+    QDialog dialogWindow(this);
+    dialogWindow.setWindowTitle("Modifica nome set");
+
+    QFormLayout* layout = new QFormLayout();
+    QLineEdit* newChartDataName = new QLineEdit(chartDataName);
+    layout->addRow("Nome fetta", newChartDataName);
+    QLineEdit* newValue = new QLineEdit(static_cast<QLineEdit*>(firstColoumn.at(k).at(0))->text());
+    newValue->setValidator(new QRegularExpressionValidator(QRegularExpression("[+-]?([0-9]*[.])?[0-9]+")));
+    layout->addRow("Valore", newValue);
+
+    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialogWindow);
+    connect(&buttonBox, SIGNAL(accepted()), &dialogWindow, SLOT(accept()));
+    connect(&buttonBox, SIGNAL(rejected()), &dialogWindow, SLOT(reject()));
+    layout->addRow(&buttonBox);
+    dialogWindow.setLayout(layout);
+    newChartDataName->setFocus();
+
+    if (!(dialogWindow.exec() == QDialog::Accepted))
+        return QPair<QString,QString>();
+    if (newChartDataName->text().isEmpty() || newChartDataName->text() == chartDataName)
+        return QPair<QString,QString>();
+
+    chartDataNames.at(k)->setText(newChartDataName->text());
+
+
+    static_cast<QLineEdit*>(firstColoumn.at(k).at(0))->setText(newValue->text());
+
+    for (auto i: static_cast<QPieSeries*>(chartView->chart()->series().at(0))->slices()){
+        QString str = QString::fromStdString(i->label().toStdString().substr(0, i->label().toStdString().find(' ')));
+        if (str == chartDataName) {
+            static_cast<QPieSeries*>(chartView->chart()->series().at(0))->remove(i);
+        }
+    }
+
+    QPieSlice* newSlice = new QPieSlice(newChartDataName->text(), newValue->text().toDouble());
+    connect (newSlice, SIGNAL(hovered(bool)), this, SLOT(explodeSlice(bool)));
+    static_cast<QPieSeries*>(chartView->chart()->series().at(0))->insert(k,newSlice);
+    updatePercentage();
+
+    return QPair<QString,QString>(newChartDataName->text(),newValue->text());
+}
+
