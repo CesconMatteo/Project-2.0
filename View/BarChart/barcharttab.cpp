@@ -45,8 +45,8 @@ void BarChartTab::setupScroll (Chart* chart) {
 
     QVBoxLayout* dataLayout = new QVBoxLayout();
 
-    firstColoumn = QList<QList<QWidget*>>();
-    secondColoumn = QList<QList<QWidget*>>();
+    firstColoumn = QList<QList<QLabel*>>();
+    secondColoumn = QList<QList<QLabel*>>();
 
     for (auto it = chart->begin(); it != chart->end(); it++) {
 
@@ -68,8 +68,8 @@ void BarChartTab::setupScroll (Chart* chart) {
         chartDataOptionButtons.push_back(setOptionBtn);
 
         QVBoxLayout* externalLayout = new QVBoxLayout();
-        QList<QWidget*> tmpFC = QList<QWidget*>();
-        QList<QWidget*> tmpSC = QList<QWidget*>();
+        QList<QLabel*> tmpFC = QList<QLabel*>();
+        QList<QLabel*> tmpSC = QList<QLabel*>();
         QList<QPushButton*> tmpBtn = QList<QPushButton*>();
 
         for (int i = 0; i < static_cast<BarChart*>(chart)->categories().size(); i++) {
@@ -177,10 +177,10 @@ void BarChartTab::resizeAxis() {
     double min = std::numeric_limits<double>::max();
     for (auto& i: secondColoumn) {
         for (auto j: i) {
-            if (static_cast<QLabel*>(j)->text().toDouble() > max)
-                max = static_cast<QLabel*>(j)->text().toDouble();
-            if (static_cast<QLabel*>(j)->text().toDouble() < min)
-                min = static_cast<QLabel*>(j)->text().toDouble();
+            if (j->text().toDouble() > max)
+                max = j->text().toDouble();
+            if (j->text().toDouble() < min)
+                min = j->text().toDouble();
         }
     }
     static_cast<QValueAxis*>(chartView->chart()->axes(Qt::Vertical).at(0))->setRange(min,max);
@@ -269,8 +269,8 @@ void BarChartTab::addChartData(const QStringList& info) {
 
         QVBoxLayout* externalLayout = new QVBoxLayout();
         externalLayout->addLayout(setLayout);
-        QList<QWidget*> tmpFC = QList<QWidget*>();
-        QList<QWidget*> tmpSC = QList<QWidget*>();
+        QList<QLabel*> tmpFC = QList<QLabel*>();
+        QList<QLabel*> tmpSC = QList<QLabel*>();
         QList<QPushButton*> tmpBtn = QList<QPushButton*>();
 
         for (int i=0; i < categories.size(); i++) {
@@ -598,7 +598,7 @@ QList<QVariant> BarChartTab::modSubChartData() {
             res.push_back(edit->text().toDouble());
     } else
         return QList<QVariant>();
-    static_cast<QLabel*>(secondColoumn.at(buttonIndexes.first).at(buttonIndexes.second))->setText(QString::number(res.at(0).toDouble()));
+    secondColoumn.at(buttonIndexes.first).at(buttonIndexes.second)->setText(QString::number(res.at(0).toDouble()));
 
     static_cast<QBarSeries*>(chartView->chart()->series().at(0))->barSets().at(buttonIndexes.first)->remove(buttonIndexes.second,1);
     static_cast<QBarSeries*>(chartView->chart()->series().at(0))->barSets().at(buttonIndexes.first)->insert(buttonIndexes.second,res.at(0).toDouble());

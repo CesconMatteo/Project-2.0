@@ -41,8 +41,8 @@ protected:
     QChartView* chartView;
     QScrollArea* scroll;
 
-    QList<QList<QWidget*>> firstColoumn;        // SUBCHARTDATA FIRST COLOUMN
-    QList<QList<QWidget*>> secondColoumn;     // SUBCHARTDATA SECOND COLOUMN
+    QList<QList<QLabel*>> firstColoumn;        // SUBCHARTDATA FIRST COLOUMN
+    QList<QList<QLabel*>> secondColoumn;     // SUBCHARTDATA SECOND COLOUMN
     QList<QList<QPushButton*>> subOptionButtons;   // SUBCHARTDATA OPTION BUTTONS
 
     bool voidChart;

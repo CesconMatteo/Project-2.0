@@ -38,8 +38,8 @@ void LineChartTab::setupScroll (Chart* chart) {
 
     QVBoxLayout* dataLayout = new QVBoxLayout();
 
-    firstColoumn = QList<QList<QWidget*>>();
-    secondColoumn = QList<QList<QWidget*>>();
+    firstColoumn = QList<QList<QLabel*>>();
+    secondColoumn = QList<QList<QLabel*>>();
 
     for (auto it = chart->begin(); it != chart->end(); it++) {
 
@@ -60,8 +60,8 @@ void LineChartTab::setupScroll (Chart* chart) {
         chartDataOptionButtons.push_back(setOptionBtn);
 
         QVBoxLayout* externalLayout = new QVBoxLayout();
-        QList<QWidget*> tmpFC = QList<QWidget*>();
-        QList<QWidget*> tmpSC = QList<QWidget*>();
+        QList<QLabel*> tmpFC = QList<QLabel*>();
+        QList<QLabel*> tmpSC = QList<QLabel*>();
         QList<QPushButton*> tmpBtn = QList<QPushButton*>();
 
         for (auto it2 = static_cast<Line*>(*it)->begin(); it2 != static_cast<Line*>(*it)->end(); it2++) {
@@ -228,8 +228,8 @@ void LineChartTab::addChartData(const QStringList& info) {
         newLayout->addWidget(separator);
         chartDataSeparators.push_back(separator);
 
-        firstColoumn.push_back(QList<QWidget*>());
-        secondColoumn.push_back(QList<QWidget*>());
+        firstColoumn.push_back(QList<QLabel*>());
+        secondColoumn.push_back(QList<QLabel*>());
         subOptionButtons.push_back(QList<QPushButton*>());
 
         static_cast<QVBoxLayout*>(scroll->widget()->layout())->addLayout(newLayout);
@@ -509,8 +509,8 @@ QList<QVariant> LineChartTab::modSubChartData() {
     } else
         return QList<QVariant>();
 
-    static_cast<QLabel*>(firstColoumn.at(buttonIndexes.first).at(buttonIndexes.second))->setText(QString("x: ").append(QString::number(res.at(0).toDouble())));
-    static_cast<QLabel*>(secondColoumn.at(buttonIndexes.first).at(buttonIndexes.second))->setText(QString("y: ").append(QString::number(res.at(1).toDouble())));
+    firstColoumn.at(buttonIndexes.first).at(buttonIndexes.second)->setText(QString("x: ").append(QString::number(res.at(0).toDouble())));
+    secondColoumn.at(buttonIndexes.first).at(buttonIndexes.second)->setText(QString("y: ").append(QString::number(res.at(1).toDouble())));
 
     static_cast<QLineSeries*>(chartView->chart()->series().at(buttonIndexes.first))->remove(buttonIndexes.second);
     static_cast<QLineSeries*>(chartView->chart()->series().at(buttonIndexes.first))->insert(buttonIndexes.second, QPoint(res.at(0).toDouble(),res.at(1).toDouble()));
@@ -531,8 +531,8 @@ void LineChartTab::resizeAxis() {
         double maxY = std::numeric_limits<double>::min();
         for (int i=0; i < firstColoumn.size(); i++) {
             for (int j=0; j < firstColoumn.at(i).size(); j++) {
-                QString a = QString::fromStdString(static_cast<QLabel*>(firstColoumn.at(i).at(j))->text().toStdString().substr(2,static_cast<QLabel*>(firstColoumn.at(i).at(j))->text().size()-1));
-                QString b = QString::fromStdString(static_cast<QLabel*>(secondColoumn.at(i).at(j))->text().toStdString().substr(2,static_cast<QLabel*>(firstColoumn.at(i).at(j))->text().size()-1));
+                QString a = QString::fromStdString(firstColoumn.at(i).at(j)->text().toStdString().substr(2,firstColoumn.at(i).at(j)->text().size()-1));
+                QString b = QString::fromStdString(secondColoumn.at(i).at(j)->text().toStdString().substr(2,secondColoumn.at(i).at(j)->text().size()-1));
                 if (a.toDouble() > maxX)
                     maxX = a.toDouble();
                 if (a.toDouble() < minX)
