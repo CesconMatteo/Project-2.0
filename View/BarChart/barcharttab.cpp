@@ -8,7 +8,7 @@ BarChartTab::BarChartTab(Chart* chart, QWidget* parent) : ChartTab(parent) {
     macroLayout->addLayout(header());
 
     if (chart->empty() && static_cast<BarChart*>(chart)->categories().isEmpty()) {
-        zeroDataTab("Inserire un set");
+        zeroDataTab("Inserire una categoria");
         macroLayout->addWidget(zeroDataLabel);
         voidChart = true;
     } else {
@@ -186,6 +186,12 @@ void BarChartTab::resizeAxis() {
 }
 
 QPair<QStringList,bool> BarChartTab::addChartDataDialog() {
+
+    if (categories.size() == 0) {
+        QMessageBox::critical(this, "Errore", "Inserire prima una categoria");
+        return QPair<QStringList,bool>(QStringList(),true);
+    }
+
     QDialog dialogWindow(this);
     dialogWindow.setWindowTitle("Nuovo set");
     QFormLayout* layout = new QFormLayout();
@@ -232,8 +238,6 @@ QPair<QStringList,bool> BarChartTab::addChartDataDialog() {
 void BarChartTab::addChartData(const QStringList& info) {
 
     if (!voidChart) {
-
-
         QBarSet* barset = new QBarSet(info.at(0));
         for (int i=1; i < info.size(); i++)
             barset->append(info.at(i).toDouble());
@@ -332,7 +336,6 @@ void BarChartTab::addChartData(const QStringList& info) {
 
         resizeAxis();
 
-
     } else {
 
         BarChart* x = new BarChart();
@@ -345,11 +348,9 @@ void BarChartTab::addChartData(const QStringList& info) {
 
         QHBoxLayout* horizontalLayout = new QHBoxLayout();
 
-        /* SCROLL */
         setupScroll(x);
         horizontalLayout->addWidget(scroll);
 
-        /* RICREO IL GRAFICO */
         dxLayout(x);
         horizontalLayout->addWidget(chartView);
 
@@ -406,7 +407,7 @@ bool BarChartTab::delChartData (const QString& barsetName) {
             delete chartView;
 
             delete layout()->takeAt(1);
-            zeroDataTab("Inserire un set");
+            zeroDataTab("Inserire una categoria");
             static_cast<QVBoxLayout*>(layout())->addWidget(zeroDataLabel);
         }
         if (!voidChart)
@@ -453,11 +454,6 @@ QPair<QString, QString> BarChartTab::modChartData (const QString& chartDataName)
 
 QString BarChartTab::addCategory() {
 
-    if (voidChart) {
-        QMessageBox::critical(this, "Errore", "Inserire prima un set");
-        return "";
-    }
-
     QString ret = "";
 
     QDialog dialogWindow(this);
@@ -481,27 +477,34 @@ QString BarChartTab::addCategory() {
 
     categories.push_back(ret);
 
-    for (int i=0; i < chartDataLayouts.size(); i++) {
-        QHBoxLayout* newLine = new QHBoxLayout();
+    if (!voidChart) {
 
-        QLabel* label = new QLabel(ret);
-        label->setAlignment(Qt::AlignCenter);
-        newLine->addWidget(label);
-        firstColoumn[i].push_back(label);
+        for (int i=0; i < chartDataLayouts.size(); i++) {
+            QHBoxLayout* newLine = new QHBoxLayout();
 
-        QLineEdit* edit = new QLineEdit("0");
-        edit->setAlignment(Qt::AlignCenter);
-        newLine->addWidget(edit);
-        secondColoumn[i].push_back(edit);
+            QLabel* label = new QLabel(ret);
+            label->setAlignment(Qt::AlignCenter);
+            newLine->addWidget(label);
+            firstColoumn[i].push_back(label);
 
-        QPushButton* btn = new QPushButton("···");
-        newLine->addWidget(btn);
-        subOptionButtons[i].push_back(btn);
+            QLineEdit* edit = new QLineEdit("0");
+            edit->setAlignment(Qt::AlignCenter);
+            newLine->addWidget(edit);
+            secondColoumn[i].push_back(edit);
 
-        chartDataLayouts.at(i)->addLayout(newLine);
+            QPushButton* btn = new QPushButton("···");
+            newLine->addWidget(btn);
+            subOptionButtons[i].push_back(btn);
+
+            chartDataLayouts.at(i)->addLayout(newLine);
+        }
+
+        static_cast<QBarCategoryAxis*>(chartView->chart()->axes(Qt::Orientation::Horizontal).at(0))->append(ret);
+    } else {
+        if (categories.size() == 1)
+            zeroDataLabel->setText("Aggiungere un set.\n Categorie: ");
+        zeroDataLabel->setText(zeroDataLabel->text().append(categories.last()).append(" "));
     }
-
-    static_cast<QBarCategoryAxis*>(chartView->chart()->axes(Qt::Orientation::Horizontal).at(0))->append(ret);
 
     return ret;
 }
