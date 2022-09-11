@@ -47,7 +47,7 @@ void ChartTab::exportPDF (const QString& folder) {
     if (!filename.endsWith(".pdf"))
         filename = filename.append(".pdf");
     QPdfWriter writer(filename);
-    writer.setPageSize(QPagedPaintDevice::A4);
+    writer.setPageSize(QPageSize::A4);
     QTextDocument doc;
     QPainter painter(&writer);
     chartView->render(&painter);

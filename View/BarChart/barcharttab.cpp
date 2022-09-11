@@ -83,7 +83,7 @@ void BarChartTab::setupScroll (Chart* chart) {
             tmpFC.push_back(label);
 
             /* VALUE */
-            QLineEdit* edit;
+            QLabel* edit;
             if (i < static_cast<BarSet*>(*it)->size()) {
                 std::stringstream stream;
                 if (fmod(static_cast<BarSet*>(*it)->at(i), 1) == 0)
@@ -92,9 +92,9 @@ void BarChartTab::setupScroll (Chart* chart) {
                     stream.precision(2);
                 stream << std::fixed;
                 stream << static_cast<BarSet*>(*it)->at(i);
-                edit = new QLineEdit (QString::fromStdString(stream.str()));
+                edit = new QLabel (QString::fromStdString(stream.str()));
             } else
-                edit = new QLineEdit("0");
+                edit = new QLabel("0");
             edit->setAlignment(Qt::AlignCenter);
             internalLayout->addWidget(edit);
             tmpSC.push_back(edit);
@@ -177,10 +177,10 @@ void BarChartTab::resizeAxis() {
     double min = std::numeric_limits<double>::max();
     for (auto& i: secondColoumn) {
         for (auto j: i) {
-            if (static_cast<QLineEdit*>(j)->text().toDouble() > max)
-                max = static_cast<QLineEdit*>(j)->text().toDouble();
-            if (static_cast<QLineEdit*>(j)->text().toDouble() < min)
-                min = static_cast<QLineEdit*>(j)->text().toDouble();
+            if (static_cast<QLabel*>(j)->text().toDouble() > max)
+                max = static_cast<QLabel*>(j)->text().toDouble();
+            if (static_cast<QLabel*>(j)->text().toDouble() < min)
+                min = static_cast<QLabel*>(j)->text().toDouble();
         }
     }
     static_cast<QValueAxis*>(chartView->chart()->axes(Qt::Vertical).at(0))->setRange(min,max);
@@ -283,7 +283,7 @@ void BarChartTab::addChartData(const QStringList& info) {
             tmpFC.push_back(label);
 
             /* VALUE */
-            QLineEdit* edit;
+            QLabel* edit;
             std::stringstream stream;
             if (fmod(info.at(i+1).toDouble(), 1) == 0)
                 stream.precision(0);
@@ -291,7 +291,7 @@ void BarChartTab::addChartData(const QStringList& info) {
                 stream.precision(2);
             stream << std::fixed;
             stream << info.at(i+1).toDouble();
-            edit = new QLineEdit (QString::fromStdString(stream.str()));
+            edit = new QLabel (QString::fromStdString(stream.str()));
             edit->setAlignment(Qt::AlignCenter);
             internalLayout->addWidget(edit);
             tmpSC.push_back(edit);
@@ -488,7 +488,7 @@ QString BarChartTab::addCategory() {
             newLine->addWidget(label);
             firstColoumn[i].push_back(label);
 
-            QLineEdit* edit = new QLineEdit("0");
+            QLabel* edit = new QLabel("0");
             edit->setAlignment(Qt::AlignCenter);
             newLine->addWidget(edit);
             secondColoumn[i].push_back(edit);
@@ -546,6 +546,8 @@ QString BarChartTab::delCategory() {
     for (auto j: static_cast<QBarSeries*>(chartView->chart()->series().at(0))->barSets())
         j->remove(i);
 
+    resizeAxis();
+
     return x;
 }
 
@@ -596,13 +598,15 @@ QList<QVariant> BarChartTab::modSubChartData() {
             res.push_back(edit->text().toDouble());
     } else
         return QList<QVariant>();
-    static_cast<QLineEdit*>(secondColoumn.at(buttonIndexes.first).at(buttonIndexes.second))->setText(QString::number(res.at(0).toDouble()));
+    static_cast<QLabel*>(secondColoumn.at(buttonIndexes.first).at(buttonIndexes.second))->setText(QString::number(res.at(0).toDouble()));
 
     static_cast<QBarSeries*>(chartView->chart()->series().at(0))->barSets().at(buttonIndexes.first)->remove(buttonIndexes.second,1);
     static_cast<QBarSeries*>(chartView->chart()->series().at(0))->barSets().at(buttonIndexes.first)->insert(buttonIndexes.second,res.at(0).toDouble());
 
     res.push_back(chartDataNames.at(buttonIndexes.first)->text());
     res.push_back(buttonIndexes.second);
+
+    resizeAxis();
 
     return res;
 }
