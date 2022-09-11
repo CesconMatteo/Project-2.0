@@ -187,9 +187,18 @@ QPair<QStringList,bool> LineChartTab::addChartDataDialog() {
 void LineChartTab::addChartData(const QStringList& info) {
 
     if (!voidChart) {
-        QLineSeries* newLine = new QLineSeries();
+        QLineSeries* newLine = new QLineSeries(chartView->chart());
         newLine->setName(info.at(0));
+
         chartView->chart()->addSeries(newLine);
+
+        delete chartView->chart()->axes(Qt::Orientation::Horizontal).at(0);
+        delete chartView->chart()->axes(Qt::Orientation::Vertical).at(0);
+        chartView->chart()->createDefaultAxes();
+        static_cast<QValueAxis*>(chartView->chart()->axes(Qt::Orientation::Horizontal).at(0))->setTickCount(10);
+        static_cast<QValueAxis*>(chartView->chart()->axes(Qt::Orientation::Vertical).at(0))->setTickCount(10);
+        chartView->chart()->axes(Qt::Orientation::Horizontal).at(0)->setTitleText("X");
+        chartView->chart()->axes(Qt::Orientation::Vertical).at(0)->setTitleText("Y");
 
         QVBoxLayout* newLayout = new QVBoxLayout();
         QHBoxLayout* internalLayout = new QHBoxLayout();
