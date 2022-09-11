@@ -116,10 +116,6 @@ bool MainWidget::eventFilter (QObject* object, QEvent* event) {
         else if (obj == exportPDFBtn)
             exportPDFBtn->setIcon(QIcon(QPixmap(":/Static/savePDF.png")));
     }
-    if (event->type() == QEvent::KeyPress) {
-        if (static_cast<QKeyEvent*>(event)->key() == Qt::Key_9)
-            abort();
-    }
     return false;
 }
 
