@@ -8,6 +8,7 @@
 class ChartTab: public QWidget {
 public:
     ChartTab (QWidget* =nullptr);
+    virtual ~ChartTab();
 
     QPushButton* getNewChartDataBtn() const;
     QPushButton* getDelChartDataBtn() const;
@@ -41,9 +42,9 @@ protected:
     QChartView* chartView;
     QScrollArea* scroll;
 
-    QList<QList<QLabel*>> firstColoumn;        // SUBCHARTDATA FIRST COLOUMN
-    QList<QList<QLabel*>> secondColoumn;     // SUBCHARTDATA SECOND COLOUMN
-    QList<QList<QPushButton*>> subOptionButtons;   // SUBCHARTDATA OPTION BUTTONS
+    QList<QList<QLabel*>> firstColoumn;
+    QList<QList<QLabel*>> secondColoumn;
+    QList<QList<QPushButton*>> subOptionButtons;
 
     bool voidChart;
 

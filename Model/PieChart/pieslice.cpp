@@ -1,9 +1,7 @@
 #include "pieslice.h"
 
 
-PieSlice::PieSlice (const QString& _name, const double& _value) : ChartData(_name), value(_value) {
-
-}
+PieSlice::PieSlice (const QString& _name, const double& _value) : ChartData(_name), value(_value) {}
 
 const double& PieSlice::getValue() const {
     return value;

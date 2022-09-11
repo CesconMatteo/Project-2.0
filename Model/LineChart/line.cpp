@@ -58,7 +58,6 @@ bool Line::operator!= (Line right) const {
     return points != right.points;
 }
 
-/* COORDINATA X PIU' GRANDE */
 double Line::maxX() const {
     double max = std::numeric_limits<double>::min();
     for (auto i: points)
@@ -67,7 +66,6 @@ double Line::maxX() const {
     return max;
 }
 
-/* COORDINATA X PIU' PICCOLA */
 double Line::minX() const {
     double min = std::numeric_limits<double>::max();
     for (auto i: points)
@@ -76,7 +74,6 @@ double Line::minX() const {
     return min;
 }
 
-/* COORDINATA Y PIU' GRANDE */
 double Line::maxY() const {
     double max = std::numeric_limits<double>::min();
     for (auto i: points)
@@ -85,7 +82,6 @@ double Line::maxY() const {
     return max;
 }
 
-/* COORDINATA Y PIU' PICCOLA */
 double Line::minY() const {
     double min = std::numeric_limits<double>::max();
     for (auto i: points)

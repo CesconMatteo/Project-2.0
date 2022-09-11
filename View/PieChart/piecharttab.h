@@ -23,7 +23,7 @@ private:
 
     QHBoxLayout* header();
     void setupScroll (Chart*);
-    void dxLayout (Chart*);
+    void setupChart (Chart*);
     void updatePercentage();
 private slots:
     void explodeSlice (bool);

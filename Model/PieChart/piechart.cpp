@@ -16,11 +16,9 @@ bool PieChart::push_back (ChartData* x) {
 
 bool PieChart::save() const {
 
-    /* SE ESISTE GIA' IL FILE LO RIMUOVO, LO RICREERO' SALVANDO */
     if (QFile::exists(path))
         QFile::remove(path);
 
-    /* CONTROLLO SE LA CARTELLA SPECIFICATA ESISTE */
     int lastSlash = path.toStdString().find_last_of("/");
     QString dirPath = QString::fromStdString(path.toStdString().substr(0, lastSlash));
     if (!QDir(dirPath).exists())
@@ -53,7 +51,6 @@ bool PieChart::load (const QString& _path) {
 
     path = _path;
 
-    /* CONTROLLO CHE CI SIA IL CAMPO TIPO E CHE SIA GIUSTO */
     QJsonObject obj = QJsonDocument().fromJson(file.readAll()).object();
     if (!obj.contains("Type") || obj["Type"] != "PieChart") {
         file.close();
@@ -75,7 +72,6 @@ bool PieChart::load (const QString& _path) {
 }
 
 bool PieChart::operator== (PieChart right) const {
-    /* DEVO CONTROLLARE CHE NON CE NE SIA NESSUNO DI DIVERSO => TUTTI UGUALI */
     for (int i=0; i< data.size(); i++) {
         PieSlice a = *static_cast<const PieSlice*>(at(i));
         PieSlice b = *static_cast<const PieSlice*>(right.at(i));
@@ -86,7 +82,6 @@ bool PieChart::operator== (PieChart right) const {
 }
 
 bool PieChart::operator!= (PieChart right) const {
-    /* DEVO CONTROLLARE CHE CE NE SIA ALMENO UNO DI DIVERSO */
     for (int i=0; i < size(); i++) {
         PieSlice a = *static_cast<const PieSlice*>(at(i));
         PieSlice b = *static_cast<const PieSlice*>(right.at(i));

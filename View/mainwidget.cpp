@@ -9,7 +9,6 @@
 #include "LineChart//linecharttab.h"
 #include "PieChart/piecharttab.h"
 
-/* CONSTRUCTOR & DESTRUCTOR */
 MainWidget::MainWidget(QWidget *parent) : QWidget(parent) {
 
     QScreen* screen = QGuiApplication::primaryScreen();
@@ -42,7 +41,6 @@ MainWidget::MainWidget(QWidget *parent) : QWidget(parent) {
 
 MainWidget::~MainWidget() {}
 
-/* SETUP HEADER -> BUTTONS */
 QHBoxLayout* MainWidget::buttons() {
     openFileBtn = new QPushButton();
     newFileBtn = new QPushButton();
@@ -119,13 +117,11 @@ bool MainWidget::eventFilter (QObject* object, QEvent* event) {
     return false;
 }
 
-/* LINK TO CONTROLLER */
 void MainWidget::setController (Controller* _controller) {
     controller = _controller;
     connectButtons();
 }
 
-/* CONNECTION SIGNAL-SLOTS */
 void MainWidget::connectButtons() {
     connect (this, SIGNAL(fileDropped(QString)), controller, SLOT(openFile(QString)));
     connect (this, SIGNAL(closing(QCloseEvent*)), controller, SLOT(checkAllFilesSaved(QCloseEvent*)));
@@ -139,7 +135,6 @@ void MainWidget::connectButtons() {
     connect (exportPDFBtn, SIGNAL(clicked()), controller, SLOT(exportPDF()));
 }
 
-// ADDS A CHARTTAB
 void MainWidget::addNewTab(Chart* x) {
     ChartTab* chartTab;
     if (dynamic_cast<BarChart*>(x))
@@ -151,7 +146,6 @@ void MainWidget::addNewTab(Chart* x) {
     else
         return;
 
-    /* TROVO IL TITOLO DEL TAB */
     unsigned int first_character_position = x->getPath().toStdString().find_last_of("/") + 1;
     QString title = QString::fromStdString(x->getPath().toStdString().substr(first_character_position, x->getPath().length()));
 
@@ -163,24 +157,23 @@ void MainWidget::addNewTab(Chart* x) {
         connect (static_cast<BarChartTab*>(chartTab)->getDelCatBtn(), SIGNAL(clicked()), controller, SLOT(delCategory()));
     }
 
-    tab->addTab(chartTab, title);
-    tab->setCurrentWidget(chartTab);
-
-
-
-    tab->resize(width(), height());         // PER FAR PARTIRE IL RESIZE DI CHARTTAB
-
     if (!_tabsOpened) {
+        delete tab->currentWidget();
         tab->removeTab(0);
         tab->setTabsClosable(true);
         _tabsOpened = true;
     }
+
+    tab->addTab(chartTab, title);
+    tab->setCurrentWidget(chartTab);
+
+    tab->resize(width(), height());
+
+
     connectChartDataButtons();
     if (dynamic_cast<BarChartTab*>(chartTab) || dynamic_cast<LineChartTab*>(chartTab))
         connectSubButtons();
 }
-
-/* DRAG AND DROP */
 
 void MainWidget::dragEnterEvent(QDragEnterEvent* e) {
     e->acceptProposedAction();
@@ -192,7 +185,6 @@ void MainWidget::dropEvent(QDropEvent* e) {
             emit fileDropped(QString::fromStdString(i.toString().toStdString().substr(7, i.toString().size())));
 }
 
-/* DIALOGS */
 void MainWidget::okDialog (const QString& message) {
     QMessageBox::information(this, "", message);
 }
@@ -201,12 +193,10 @@ void MainWidget::errorDialog(const QString& message) {
     QMessageBox::critical(this, "Errore", message);
 }
 
-// OPENS THE DIALOG THAT GET THE FILEPATH
 QString MainWidget::openFileDialog (const QString& folder) {
     return QFileDialog::getOpenFileName(this, "Seleziona il file", folder, "JSON files (*.json)");
 }
 
-// ASK IF YOU WANT TO SAVE OR NOT BEFORE CLOSING
 SaveOptions MainWidget::fileNotSavedDialog() {
     QMessageBox::StandardButton reply = QMessageBox::question (this, "Salvare?", "File non salvato, salvare?", QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
     switch (reply) {
@@ -221,7 +211,6 @@ SaveOptions MainWidget::fileNotSavedDialog() {
     }
 }
 
-// GET WHERE TO SAVE A CHART WITH A FILE THAT DOESNT EXISTS
 QString MainWidget::savePathDialog (const QString& folder) {
     return QFileDialog::getSaveFileName(this, "Salva in", folder, "JSON files(*.json)");
 }
@@ -244,8 +233,10 @@ QString MainWidget::chooseTypeDialog() {
 }
 
 void MainWidget::closeTab (const int& i) {
-    if (i < tab->count() && i >= 0)
+    if (i < tab->count() && i >= 0) {
+        delete tab->widget(i);
         tab->removeTab(i);
+    }
     if (tab->count() == 0) {
         tab->setTabsClosable(false);
         QLabel* introTab = new QLabel("Creare un nuovo file o aprirne uno");
@@ -264,7 +255,6 @@ int MainWidget::currentTabIndex() const {
     return tab->currentIndex();
 }
 
-/* CAMBIA LA SCRITTA SUL TITOLO DELLO SPECIFICO TAB IN CASO VENGA CAMBIATO */
 void MainWidget::updatePath (const QString& newPath) {
     unsigned int first_character_position = newPath.toStdString().find_last_of("/") + 1;
     QString title = QString::fromStdString(newPath.toStdString().substr(first_character_position, newPath.length()));
@@ -275,7 +265,6 @@ void MainWidget::closeEvent (QCloseEvent* e) {
     emit closing(e);
 }
 
-/* RIMBALZO CHIAMATE */
 QStringList MainWidget::addChartData() {
     QPair<QStringList,bool> tmp = static_cast<ChartTab*>(tab->currentWidget())->addChartDataDialog();
     if (!tmp.first.isEmpty()) {

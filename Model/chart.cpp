@@ -10,9 +10,11 @@ Chart::Chart (const QString& _path) : path(_path) {
     data = QList<ChartData*>();
 }
 
-Chart::~Chart() {}
+Chart::~Chart() {
+    for (auto i: data)
+        delete i;
+}
 
-/* GETTERS-SETTERS */
 const QString& Chart::getPath() const {
     return path;
 }
@@ -25,11 +27,6 @@ void Chart::setPath (const QString& _path) {
         path = path.append(".json");
 }
 
-ChartData*& Chart::operator[](const int& i) {
-    return data[i];
-}
-
-/* OPERAZIONI DEL QLIST */
 void Chart::clear() {
     data.clear();
 }
@@ -59,6 +56,7 @@ bool Chart::empty() const {
 }
 
 void Chart::erase(QList<ChartData*>::Iterator it) {
+    delete (*it);
     data.erase(it);
 }
 
@@ -71,5 +69,6 @@ void Chart::replace(const int& pos, ChartData* newElement) {
 }
 
 void Chart::removeAt (const int& i) {
+    delete data.at(i);
     data.removeAt(i);
 }

@@ -1,7 +1,48 @@
 #include "charttab.h"
 
 
-ChartTab::ChartTab(QWidget* parent) : QWidget(parent) {}
+ChartTab::ChartTab(QWidget* parent) : QWidget(parent) {
+    scroll = nullptr;
+    chartView = nullptr;
+}
+
+ChartTab::~ChartTab() {
+    for (auto& i: firstColoumn)
+        for (auto j: i)
+            if (j)
+                delete j;
+    for (auto& i: secondColoumn)
+        for (auto j: i)
+            if (j)
+                delete j;
+    for (auto& i: subOptionButtons)
+        for (auto j: i)
+            if (j)
+                delete j;
+
+    if (newChartDataBtn)
+        delete newChartDataBtn;
+    if (delChartDataBtn)
+        delete delChartDataBtn;
+
+    for (auto i: chartDataNames)
+        if (i)
+            delete i;
+    for (auto i: chartDataOptionButtons)
+        if (i)
+        delete i;
+    for (auto i: chartDataSeparators)
+        if (i)
+        delete i;
+    for (auto i: chartDataLayouts)
+        if (i)
+        delete i;
+
+    if (chartView != nullptr)
+        delete chartView;
+    if (scroll != nullptr)
+        delete scroll;
+}
 
 QFrame* ChartTab::createSeparator () {
     QFrame* separator = new QFrame();

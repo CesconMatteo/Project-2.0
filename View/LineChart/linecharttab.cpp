@@ -15,7 +15,7 @@ LineChartTab::LineChartTab(Chart* chart, QWidget* parent) : ChartTab(parent) {
         QHBoxLayout* horizontalLayout = new QHBoxLayout();
         setupScroll(chart);
         horizontalLayout->addWidget(scroll);
-        horizontalLayout->addWidget(dxLayout(chart));
+        horizontalLayout->addWidget(setupChart(chart));
         macroLayout->addLayout(horizontalLayout);
         voidChart = false;
     }
@@ -43,7 +43,6 @@ void LineChartTab::setupScroll (Chart* chart) {
 
     for (auto it = chart->begin(); it != chart->end(); it++) {
 
-        /* LINE NAME LAYOUT */
         QHBoxLayout* lineNameLayout = new QHBoxLayout();
         QLabel* label = new QLabel((*it)->getName());
         QFont font = label->font();
@@ -54,7 +53,7 @@ void LineChartTab::setupScroll (Chart* chart) {
         lineNameLayout->addWidget(label);
         chartDataNames.push_back(label);
 
-        QPushButton* setOptionBtn = new QPushButton("Opzioni");         // ADD BUTTON
+        QPushButton* setOptionBtn = new QPushButton("Opzioni");
         lineNameLayout->addWidget(setOptionBtn);
         dataLayout->addLayout(lineNameLayout);
         chartDataOptionButtons.push_back(setOptionBtn);
@@ -67,9 +66,8 @@ void LineChartTab::setupScroll (Chart* chart) {
         for (auto it2 = static_cast<Line*>(*it)->begin(); it2 != static_cast<Line*>(*it)->end(); it2++) {
             QHBoxLayout* internalLayout = new QHBoxLayout();
 
-            /* LINEEDIT X */
             stringstream x;
-            if (fmod((*it2).first, 1.0) == 0)       // CHECK FOR SET THE PRECISION
+            if (fmod((*it2).first, 1.0) == 0)
                 x.precision(0);
             else
                 x.precision(2);
@@ -80,9 +78,8 @@ void LineChartTab::setupScroll (Chart* chart) {
             internalLayout->addWidget(xEdit);
             tmpFC.push_back(xEdit);
 
-            /* LINEEDIT Y */
             stringstream y;
-            if (fmod((*it2).second, 1.0) == 0)       // CHECK FOR SET THE PRECISION
+            if (fmod((*it2).second, 1.0) == 0)
                 y.precision(0);
             else
                 y.precision(2);
@@ -93,7 +90,6 @@ void LineChartTab::setupScroll (Chart* chart) {
             internalLayout->addWidget(yEdit);
             tmpSC.push_back(yEdit);
 
-            /* BUTTON */
             QPushButton* btn = new QPushButton("···");
             internalLayout->addWidget(btn);
             tmpBtn.push_back(btn);
@@ -115,7 +111,6 @@ void LineChartTab::setupScroll (Chart* chart) {
 
     dataLayout->setSizeConstraint(QLayout::SetFixedSize);
 
-    /* SET UP SCROLL */
     QWidget* scrollWidget = new QWidget();
     scrollWidget->setLayout(dataLayout);
     scroll = new QScrollArea();
@@ -128,7 +123,7 @@ void LineChartTab::setupScroll (Chart* chart) {
     scroll->widget()->installEventFilter(this);
 }
 
-QChartView* LineChartTab::dxLayout (Chart* chart) {
+QChartView* LineChartTab::setupChart (Chart* chart) {
 
     QChart* graphicChart = new QChart();
     graphicChart->setAnimationOptions(QChart::SeriesAnimations);
@@ -138,12 +133,11 @@ QChartView* LineChartTab::dxLayout (Chart* chart) {
     for (auto it = chart->begin(); it != chart->end(); it++) {
 
         QLineSeries* line = new QLineSeries();
-        line->setName((*it)->getName());            // LINE NAME
+        line->setName((*it)->getName());
 
-        /* APPEND ALL POINTS */
         for (auto it2 = static_cast<Line*>(*it)->begin(); it2 != static_cast<Line*>(*it)->end(); it2++)
             line->append((*it2).first, (*it2).second);
-        graphicChart->addSeries(line);              // ADD LINE
+        graphicChart->addSeries(line);
     }
 
     graphicChart->createDefaultAxes();
@@ -184,7 +178,6 @@ QPair<QStringList,bool> LineChartTab::addChartDataDialog() {
     return QPair<QStringList,bool>(tmp,true);
 }
 
-/* DA CONTROLLARE PER EVENTUALI LAYOUT CHE RESTANO IN MEMORIA */
 void LineChartTab::addChartData(const QStringList& info) {
 
     if (!voidChart) {
@@ -205,7 +198,7 @@ void LineChartTab::addChartData(const QStringList& info) {
         QHBoxLayout* internalLayout = new QHBoxLayout();
         QVBoxLayout* externalLayout = new QVBoxLayout();
 
-        QLabel* label = new QLabel(info.at(0));                         // ADD LABEL
+        QLabel* label = new QLabel(info.at(0));
         QFont font = label->font();
         font.setBold(true);
         font.setPointSize(20);
@@ -218,7 +211,7 @@ void LineChartTab::addChartData(const QStringList& info) {
         chartDataLayouts.push_back(externalLayout);
         externalLayout->addLayout(internalLayout);
 
-        QPushButton* setOptionBtn = new QPushButton("Opzioni");         // ADD BUTTON
+        QPushButton* setOptionBtn = new QPushButton("Opzioni");
         internalLayout->addWidget(setOptionBtn);
         chartDataOptionButtons.push_back(setOptionBtn);
 
@@ -243,7 +236,7 @@ void LineChartTab::addChartData(const QStringList& info) {
         QHBoxLayout* horizontalLayout = new QHBoxLayout();
         setupScroll(x);
         horizontalLayout->addWidget(scroll);
-        dxLayout(x);
+        setupChart(x);
         horizontalLayout->addWidget(chartView);
         delete zeroDataLabel;
         zeroDataLabel = nullptr;
@@ -267,7 +260,6 @@ bool LineChartTab::delChartData (const QString& lineName) {
         j++;
     }
 
-    /* RIMOZIONE DAI DATI */
     if (k != -1) {
 
         for (int i=0; i < subOptionButtons.at(k).size(); i++) {
@@ -288,11 +280,12 @@ bool LineChartTab::delChartData (const QString& lineName) {
         chartDataSeparators.removeAt(k);
         chartDataLayouts.removeAt(k);
 
-        /* CONTROLLO SE E' VUOTO */
         if (firstColoumn.size() == 0) {
             voidChart = true;
             delete scroll;
+            scroll = nullptr;
             delete chartView;
+            chartView = nullptr;
 
             zeroDataTab("Inserire una linea");
             static_cast<QVBoxLayout*>(layout())->addWidget(zeroDataLabel);
@@ -397,7 +390,7 @@ QList<double> LineChartTab::addNewPoint (const QString& chartDataName) {
     res.push_back(index);
 
     QHBoxLayout* internalLayout = new QHBoxLayout();
-    /* LINEEDIT X */
+
     stringstream xStream;
     if (fmod(res.at(0), 1.0) == 0)
         xStream.precision(0);
@@ -410,7 +403,6 @@ QList<double> LineChartTab::addNewPoint (const QString& chartDataName) {
     internalLayout->addWidget(xEdit);
     firstColoumn[index].push_back(xEdit);
 
-    /* LINEEDIT Y */
     stringstream yStream;
     if (fmod(res.at(1), 1.0) == 0)
         yStream.precision(0);
@@ -423,7 +415,6 @@ QList<double> LineChartTab::addNewPoint (const QString& chartDataName) {
     internalLayout->addWidget(yEdit);
     secondColoumn[index].push_back(yEdit);
 
-    /* BUTTON */
     QPushButton* btn = new QPushButton("···");
     internalLayout->addWidget(btn);
     subOptionButtons[index].push_back(btn);

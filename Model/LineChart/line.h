@@ -7,7 +7,6 @@
 
 class Line : public ChartData {
 private:
-    /* OGNI PUNTO E' RAPPRESENTANTO CON UN QPAIR, FIRST E' X E SECOND E' Y */
     QList<QPair<double,double>> points;
 public:
     Line(const QString&);

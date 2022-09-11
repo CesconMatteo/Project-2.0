@@ -11,7 +11,7 @@ class Chart {
 public:
     Chart (const QString& =0);
     virtual ~Chart();
-    /* OPERAZIONI DEL QLIST */
+
     const ChartData* at (const int&) const;
     QList<ChartData*>::Iterator begin();
     QList<ChartData*>::Iterator end();
@@ -25,21 +25,12 @@ public:
     void replace (const int&, ChartData*);
     void removeAt (const int&);
 
-    /* METODI SPECIFICI */
     virtual bool save() const =0;
     virtual bool load (const QString&) =0;
 
-    /* GETTERS-SETTERS */
     const QString& getPath() const;
     void setPath (const QString&);
 
-    ChartData*& operator[](const int&);
-
-/*
-    virtual void eraseSingleElement (const int&, const int& =0) =0;
-    virtual bool modify (ChartData*, const int&, const int& =0) =0;
-    virtual void addSet (QString) =0;
-*/
 protected:
     QList<ChartData*> data;
     QString path;

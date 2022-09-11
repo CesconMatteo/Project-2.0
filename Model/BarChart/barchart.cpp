@@ -18,11 +18,9 @@ bool BarChart::push_back(ChartData* x) {
 
 bool BarChart::save() const {
 
-    /* SE ESISTE GIA' IL FILE LO RIMUOVO, LO RICREERO' SALVANDO */
     if (QFile::exists(path))
         QFile::remove(path);
 
-    /* CONTROLLO SE LA CARTELLA SPECIFICATA ESISTE */
     int lastSlash = path.toStdString().find_last_of("/");
     QString dirPath = QString::fromStdString(path.toStdString().substr(0, lastSlash));
     if (!QDir(dirPath).exists())

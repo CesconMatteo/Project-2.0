@@ -9,11 +9,11 @@ void Controller::setup (Model* _model, MainWidget* _view) {
 
 void Controller::openFile(QString dropPath) {
     QString path;
-    if (dropPath.isEmpty())     // NON E' DRAG & DROP
+    if (dropPath.isEmpty())
         path = view->openFileDialog(model->getDesktopPath());
-    else                        // E' DRAG & DROP
+    else
         path = dropPath;
-    if (!path.isEmpty()) {      // CHECK SE NON E' DRAG & DROP E E' STATO INSERITO UN PATH CORRETTO
+    if (!path.isEmpty()) {
         if (model->loadChart(path))
             view->addNewTab(model->last());
         else
@@ -23,16 +23,15 @@ void Controller::openFile(QString dropPath) {
 
 void Controller::closeTab (int i) {
 
-    /* CONTROLLO SE IL FILE E' SALVATO */
     if (!model->isSaved(i)) {
         SaveOptions opt = view->fileNotSavedDialog();
         switch (opt) {
-            case Save:          /* SALVO */
+            case Save:
                 saveFile();
                 break;
-            case DontSave:      /* NON FACCIO NIENTE */
+            case DontSave:
                 break;
-            case Cancel:        /* RITORNO IN MODO DA NON CHIUDERE IL TAB */
+            case Cancel:
                 return;
         }
     }
@@ -43,14 +42,14 @@ void Controller::closeTab (int i) {
 }
 
 void Controller::saveFile() {
-    if (!view->tabsOpened()) // NON CI SONO TAB APERTE
+    if (!view->tabsOpened())
         view->errorDialog("Nessun grafico aperto!");
     else {
         int index = view->currentTabIndex();
-        if (model->chartFileExists(index)) {            // SE IL FILE GIA' ESISTE LO SALVO DIRETTAMENTE
+        if (model->chartFileExists(index)) {
             model->saveChart(index);
             view->okDialog("Salvataggio eseguito correttamente.");
-        } else                                          // ALTRIMENTI ESEGUO SALVA COME
+        } else
             saveAs();
     }
 }
@@ -84,7 +83,7 @@ void Controller::newFile() {
 }
 
 void Controller::checkAllFilesSaved (QCloseEvent* e) {
-    if (!model->allSaved())         // SE NON SONO TUTTI SALVATI
+    if (!model->allSaved())
         if (!view->yesOrNoDialog("Non tutti i file sono stati salvati. Chiudere lo stesso?"))
             e->ignore();
 }
@@ -99,11 +98,11 @@ void Controller::newChartData() {
 void Controller::delChartData (QString chartDataName) {
     if (chartDataName.isEmpty()) {
         chartDataName = view->delChartDataDialog();
-        if (chartDataName.isEmpty())                    // SCHIACCIO CANCEL SUL DIALOG
+        if (chartDataName.isEmpty())
             return;
     }
-    if (model->removeChartData(view->currentTabIndex(), chartDataName))         // RIMOZIONE CORRETTA DAL MODEL
-        if (view->delChartData(chartDataName))                                  // RIMOZIONE CORRETTA DAL VIEW
+    if (model->removeChartData(view->currentTabIndex(), chartDataName))
+        if (view->delChartData(chartDataName))
             view->okDialog("Rimozione corretta");
         else
             view->errorDialog("Errore!");
@@ -111,7 +110,6 @@ void Controller::delChartData (QString chartDataName) {
         view->errorDialog("Errore! Elemento non presente nel file");
 }
 
-/* INFO.SECOND E' IL NOME DEL CHARTDATA */
 void Controller::chartDataOptions() {
     QPair<QString,QString> info = view->showChartDataOptionsMenu(static_cast<QPushButton*>(QObject::sender()));
     if (info.first == "Modifica") {
@@ -135,7 +133,6 @@ void Controller::delCategory() {
         model->removeCategory(view->currentTabIndex(),cat);
 }
 
-/* INFO.SECOND E' IL NOME DEL CHARTDATA */
 void Controller::subOptions() {
     view->showSubOptionsMenu(static_cast<QPushButton*>(QObject::sender()));
 

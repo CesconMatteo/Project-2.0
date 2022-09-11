@@ -18,11 +18,9 @@ class MainWidget : public QWidget {
 private:
     Controller* controller;
 
-    /* DESKTOP DIMENSIONS */
     unsigned int desktopWidth;
     unsigned int desktopHeight;
 
-    /* BUTTONS RELATED ITEMS */
     QHBoxLayout* buttons();
     QPushButton* openFileBtn;
     QPushButton* newFileBtn;
@@ -31,7 +29,6 @@ private:
     QPushButton* exportPDFBtn;
     bool eventFilter (QObject*, QEvent*);
 
-    /* TAB RELATED ITEMS */
     QTabWidget* tab;
     bool _tabsOpened;
 
@@ -42,13 +39,11 @@ public:
     void setController (Controller*);
     void connectButtons();
 
-    /* TAB */
     void addNewTab (Chart*);
     void dragEnterEvent (QDragEnterEvent*) final;
     void dropEvent (QDropEvent*) final;
     void closeTab (const int&);
 
-    /* DIALOGS */
     QString openFileDialog (const QString&);
     void okDialog (const QString&);
     void errorDialog (const QString&);
@@ -62,7 +57,6 @@ public:
     void updatePath (const QString&);
     void closeEvent (QCloseEvent*);
 
-    /* RIMBALZO CHIAMATE */
     QStringList addChartData();
     void connectChartDataButtons();
     void connectSubButtons();
@@ -75,7 +69,6 @@ public:
     QPair<QString,int> delPoint ();
     QList<QVariant> modSubChartData();
 
-    /* SUBCHARTDATA */
     QPair<double,double> addNewPoint (const QString&);
     QString newCategory();
     QString delCategory();

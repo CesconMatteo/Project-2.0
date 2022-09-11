@@ -1,13 +1,3 @@
-#define TEST 0
-
-#if TEST == 1
-#include <iostream>
-using namespace std;
-int main() {
-
-}
-#else
-
 #include "View/mainwidget.h"
 #include "Model/model.h"
 #include "Control/controller.h"
@@ -26,4 +16,3 @@ int main(int argc, char *argv[]) {
     app.setWindowIcon(QIcon(":/Static/icon.png"));
     return app.exec();
 }
-#endif

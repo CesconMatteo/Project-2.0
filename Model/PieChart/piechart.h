@@ -13,8 +13,10 @@ class PieChart : public Chart {
 public:
     PieChart (const QString& ="");
     ~PieChart();
+
     bool push_back (ChartData*) final;
     bool save() const final;
+
     bool load (const QString&) final;
     bool operator== (PieChart) const;
     bool operator!= (PieChart) const;

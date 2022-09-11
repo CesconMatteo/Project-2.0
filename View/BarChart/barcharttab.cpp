@@ -15,13 +15,20 @@ BarChartTab::BarChartTab(Chart* chart, QWidget* parent) : ChartTab(parent) {
         QHBoxLayout* horizontalLayout = new QHBoxLayout();
         setupScroll(chart);
         horizontalLayout->addWidget(scroll);
-        dxLayout(chart);
+        setupChart(chart);
         horizontalLayout->addWidget(chartView);
         macroLayout->addLayout(horizontalLayout);
         voidChart = false;
     }
 
     setLayout(macroLayout);
+}
+
+BarChartTab::~BarChartTab() {
+    if (newCatBtn)
+        delete newCatBtn;
+    if (delCatBtn)
+        delete delCatBtn;
 }
 
 QHBoxLayout* BarChartTab::header() {
@@ -50,9 +57,8 @@ void BarChartTab::setupScroll (Chart* chart) {
 
     for (auto it = chart->begin(); it != chart->end(); it++) {
 
-        /* SET NAME LAYOUT */
         QHBoxLayout* setLayout = new QHBoxLayout();
-        QLabel* setName = new QLabel((*it)->getName());                 // ADD LABEL
+        QLabel* setName = new QLabel((*it)->getName());
         QFont font = setName->font();
         font.setBold(true);
         font.setPointSize(20);
@@ -62,7 +68,7 @@ void BarChartTab::setupScroll (Chart* chart) {
         setLayout->addWidget(setName);
         chartDataNames.push_back(setName);
 
-        QPushButton* setOptionBtn = new QPushButton("Opzioni");         // ADD BUTTON
+        QPushButton* setOptionBtn = new QPushButton("Opzioni");
         setLayout->addWidget(setOptionBtn);
         dataLayout->addLayout(setLayout);
         chartDataOptionButtons.push_back(setOptionBtn);
@@ -76,13 +82,11 @@ void BarChartTab::setupScroll (Chart* chart) {
 
             QHBoxLayout* internalLayout = new QHBoxLayout();
 
-            /* CATEGORY */
             QLabel* label = new QLabel(static_cast<BarChart*>(chart)->categories().at(i));
             label->setAlignment(Qt::AlignCenter);
             internalLayout->addWidget(label);
             tmpFC.push_back(label);
 
-            /* VALUE */
             QLabel* edit;
             if (i < static_cast<BarSet*>(*it)->size()) {
                 std::stringstream stream;
@@ -99,7 +103,6 @@ void BarChartTab::setupScroll (Chart* chart) {
             internalLayout->addWidget(edit);
             tmpSC.push_back(edit);
 
-            /* BUTTON */
             QPushButton* btn = new QPushButton("···");
             internalLayout->addWidget(btn);
             tmpBtn.push_back(btn);
@@ -122,7 +125,6 @@ void BarChartTab::setupScroll (Chart* chart) {
 
     dataLayout->setSizeConstraint(QLayout::SetFixedSize);
 
-    /* SET UP SCROLL */
     QWidget* scrollWidget = new QWidget();
     scrollWidget->setLayout(dataLayout);
     scrollWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -135,7 +137,7 @@ void BarChartTab::setupScroll (Chart* chart) {
     scroll->widget()->installEventFilter(this);
 }
 
-void BarChartTab::dxLayout (Chart* chart) {
+void BarChartTab::setupChart (Chart* chart) {
 
     categories = QStringList();
     for (auto& i: static_cast<BarChart*>(chart)->categories())
@@ -144,9 +146,8 @@ void BarChartTab::dxLayout (Chart* chart) {
     QBarSeries* series = new QBarSeries();
     for (auto it = chart->begin(); it != chart->end(); it++) {
         QBarSet* barSet = new QBarSet((*it)->getName());
-        for (auto it2 = static_cast<BarSet*>(*it)->begin(); it2 != static_cast<BarSet*>(*it)->end(); it2++) {
-            barSet->append((*it2));                 // CONTROLLARE PER 0
-        }
+        for (auto it2 = static_cast<BarSet*>(*it)->begin(); it2 != static_cast<BarSet*>(*it)->end(); it2++)
+            barSet->append((*it2));
         series->append(barSet);
     }
 
@@ -204,7 +205,7 @@ QPair<QStringList,bool> BarChartTab::addChartDataDialog() {
     label->setFont(font);
     layout->addRow(label, setName);
     QList<QLineEdit*> edits;
-    for (int i=0; i < categories.size(); i++) {                 // CICLA TANTE VOLTE QUANTE LE CATEGORIE
+    for (int i=0; i < categories.size(); i++) {
         QLineEdit* tmp = new QLineEdit();
         tmp->setValidator(new QRegularExpressionValidator(QRegularExpression("[+-]?([0-9]*[.])?[0-9]+")));
         layout->addRow(categories.at(i), tmp);
@@ -263,7 +264,7 @@ void BarChartTab::addChartData(const QStringList& info) {
         setLayout->addWidget(setName);
         chartDataNames.push_back(setName);
 
-        QPushButton* setOptionBtn = new QPushButton("Opzioni");         // ADD BUTTON
+        QPushButton* setOptionBtn = new QPushButton("Opzioni");
         setLayout->addWidget(setOptionBtn);
         chartDataOptionButtons.push_back(setOptionBtn);
 
@@ -282,7 +283,6 @@ void BarChartTab::addChartData(const QStringList& info) {
             internalLayout->addWidget(label);
             tmpFC.push_back(label);
 
-            /* VALUE */
             QLabel* edit;
             std::stringstream stream;
             if (fmod(info.at(i+1).toDouble(), 1) == 0)
@@ -296,7 +296,6 @@ void BarChartTab::addChartData(const QStringList& info) {
             internalLayout->addWidget(edit);
             tmpSC.push_back(edit);
 
-            /* BUTTON */
             QPushButton* btn = new QPushButton("···");
             internalLayout->addWidget(btn);
             tmpBtn.push_back(btn);
@@ -352,7 +351,7 @@ void BarChartTab::addChartData(const QStringList& info) {
         setupScroll(x);
         horizontalLayout->addWidget(scroll);
 
-        dxLayout(x);
+        setupChart(x);
         horizontalLayout->addWidget(chartView);
 
         delete zeroDataLabel;
@@ -366,10 +365,9 @@ void BarChartTab::addChartData(const QStringList& info) {
 
 bool BarChartTab::delChartData (const QString& barsetName) {
 
-    int j=0;            // INDICI PER VERIFICARE CHE CI SIA LO SPECIFICO BARSET
+    int j=0;
     int k=-1;
 
-    /* RIMOZIONE DAL GRAFICO */
     QBarSeries* series = new QBarSeries();
     QList<QBarSet*> barsets = (static_cast<QBarSeries*>(chartView->chart()->series().at(0))->barSets());
     for (auto it = barsets.begin(); it != barsets.end(); it++) {
@@ -382,7 +380,6 @@ bool BarChartTab::delChartData (const QString& barsetName) {
     chartView->chart()->removeAllSeries();
     chartView->chart()->addSeries(series);
 
-    /* RIMOZIONE DAI DATI */
     if (k != -1) {
 
         for (int i=0; i < subOptionButtons.at(k).size(); i++) {
@@ -401,11 +398,12 @@ bool BarChartTab::delChartData (const QString& barsetName) {
         chartDataNames.removeAt(k);
         chartDataSeparators.removeAt(k);
 
-        /* CONTROLLO SE E' VUOTO */
         if (firstColoumn.size() == 0) {
             voidChart = true;
             delete scroll;
+            scroll = nullptr;
             delete chartView;
+            chartView = nullptr;
 
             delete layout()->takeAt(1);
             zeroDataTab("Inserire una categoria");

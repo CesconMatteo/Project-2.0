@@ -16,11 +16,9 @@ bool LineChart::push_back(ChartData* x) {
 
 bool LineChart::save() const {
 
-    /* SE ESISTE GIA' IL FILE LO RIMUOVO, LO RICREERO' SALVANDO */
     if (QFile::exists(path))
         QFile::remove(path);
 
-    /* CONTROLLO SE LA CARTELLA SPECIFICATA ESISTE */
     int lastSlash = path.toStdString().find_last_of("/");
     QString dirPath = QString::fromStdString(path.toStdString().substr(0, lastSlash));
     if (!QDir(dirPath).exists())
@@ -62,7 +60,6 @@ bool LineChart::load (const QString& _path) {
 
     path = _path;
 
-    /* CONTROLLO CHE CI SIA IL CAMPO TIPO E CHE SIA GIUSTO */
     QJsonObject obj = QJsonDocument().fromJson(file.readAll()).object();
     if (!obj.contains("Type") || obj["Type"] != "LineChart") {
         file.close();
@@ -91,7 +88,7 @@ bool LineChart::load (const QString& _path) {
 }
 
 bool LineChart::operator== (LineChart right) const {
-    /* DEVO CONTROLLARE CHE NON CE NE SIA NESSUNO DI DIVERSO => TUTTI UGUALI */
+
     for (int i=0; i < size(); i++) {
         Line a = *static_cast<const Line*>(at(i));
         Line b = *static_cast<const Line*>(right.at(i));
@@ -102,7 +99,7 @@ bool LineChart::operator== (LineChart right) const {
 }
 
 bool LineChart::operator!= (LineChart right) const {
-    /* DEVO CONTROLLARE CHE CE NE SIA ALMENO UNO DI DIVERSO */
+
     for (int i=0; i< size(); i++) {
         Line a = *static_cast<const Line*>(at(i));
         Line b = *static_cast<const Line*>(right.at(i));

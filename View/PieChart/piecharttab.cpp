@@ -15,7 +15,7 @@ PieChartTab::PieChartTab(Chart* chart, QWidget* parent) : ChartTab(parent) {
         QHBoxLayout* horizontalLayout = new QHBoxLayout();
         setupScroll(chart);
         horizontalLayout->addWidget(scroll);
-        dxLayout(chart);
+        setupChart(chart);
         horizontalLayout->addWidget(chartView);
         updatePercentage();
         macroLayout->addLayout(horizontalLayout);
@@ -44,7 +44,7 @@ void PieChartTab::setupScroll (Chart* chart) {
 
         QHBoxLayout* firstLayout = new QHBoxLayout();
 
-        QLabel* sliceName = new QLabel((*it)->getName());            // ADD LABEL
+        QLabel* sliceName = new QLabel((*it)->getName());
         QFont font = sliceName->font();
         font.setBold(true);
         font.setPointSize(20);
@@ -54,7 +54,6 @@ void PieChartTab::setupScroll (Chart* chart) {
         firstLayout->addWidget(sliceName);
         chartDataNames.push_back(sliceName);
 
-        /* BUTTON */
         QPushButton* btn = new QPushButton("Opzioni");
         firstLayout->addWidget(btn);
         chartDataOptionButtons.push_back(btn);
@@ -95,7 +94,6 @@ void PieChartTab::setupScroll (Chart* chart) {
 
     dataLayout->setSizeConstraint(QLayout::SetFixedSize);
 
-    /* SET UP SCROLL */
     QWidget* scrollWidget = new QWidget();
     scrollWidget->setLayout(dataLayout);
     scroll = new QScrollArea();
@@ -107,7 +105,7 @@ void PieChartTab::setupScroll (Chart* chart) {
     scroll->widget()->installEventFilter(this);
 }
 
-void PieChartTab::dxLayout (Chart* chart) {
+void PieChartTab::setupChart (Chart* chart) {
 
     QPieSeries* series = new QPieSeries();
 
@@ -210,7 +208,7 @@ void PieChartTab::addChartData(const QStringList& info) {
         firstLayout->addWidget(label);
         chartDataNames.push_back(label);
 
-        QPushButton* setOptionBtn = new QPushButton("Opzioni");         // ADD BUTTON
+        QPushButton* setOptionBtn = new QPushButton("Opzioni");
         firstLayout->addWidget(setOptionBtn);
         chartDataOptionButtons.push_back(setOptionBtn);
 
@@ -255,7 +253,7 @@ void PieChartTab::addChartData(const QStringList& info) {
         QHBoxLayout* horizontalLayout = new QHBoxLayout();
         setupScroll(x);
         horizontalLayout->addWidget(scroll);
-        dxLayout(x);
+        setupChart(x);
         horizontalLayout->addWidget(chartView);
         delete zeroDataLabel;
         zeroDataLabel = nullptr;
@@ -298,7 +296,6 @@ bool PieChartTab::delChartData (const QString& sliceName) {
 
         updatePercentage();
 
-        /* CONTROLLO SE E' VUOTO */
         if (firstColoumn.size() == 0) {
             voidChart = true;
             delete scroll;

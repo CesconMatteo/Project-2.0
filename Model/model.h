@@ -23,7 +23,6 @@ public:
 
     const QString& getDesktopPath() const;
 
-    /* CHART RELATED */
     const Chart* chartAt (const int&) const;
     bool loadChart (const QString&);
     void newChart (ChartType);
@@ -33,14 +32,13 @@ public:
     bool allSaved() const;
     void removeChart (const int&);
     Chart* last();
+
     bool chartFileExists (const int&) const;
 
-    /* CHARTDATA RELATED */
     void addChartData (const int&, const QStringList&);
     bool removeChartData (const int&, const QString&);
     void modifyChartData (const int&, const QString&, const QString&, const double&);
 
-    /* ELEMENTS OF CHARTDATA */
     void addPoint (const int&, const QString&, const QPair<double,double>&);
     void removePoint (const int&, const QString&, const int&);
     void addCategory (const int&, const QString&);

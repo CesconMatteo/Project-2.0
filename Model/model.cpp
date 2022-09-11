@@ -22,7 +22,6 @@ const Chart* Model::chartAt (const int& i) const {
 bool Model::loadChart (const QString& path) {
     Chart* x;
 
-    /* CONTROLLO CHE IL FILE ESISTA E NON SIA CORROTTO */
     QFile file(path);
     if (!file.open(QFile::ReadOnly))
         return false;
@@ -100,14 +99,15 @@ bool Model::allSaved() const {
 }
 
 void Model::removeChart(const int& i) {
+    delete charts.at(i);
     charts.removeAt(i);
     saved.removeAt(i);
 }
 
-void Model::addChartData (const int& i, const QStringList& info) {          // INFO CONTIENE NEL PRIMO CAMPO IL NOME
-                                                                            // PER BARCHART CONTIENE ANCHE I VALORI, IN CASO DI NON INSERIMENTO
-    if (dynamic_cast<BarChart*>(charts.at(i))) {                            // CONTIENE 0
-                                                                            // PER PIECHART CONTIENE ANCHE IL VALORE DELLA FETTA
+void Model::addChartData (const int& i, const QStringList& info) {
+
+    if (dynamic_cast<BarChart*>(charts.at(i))) {
+
         BarSet* newBarSet = new BarSet(info.at(0));
         for (int j=1; j < info.size(); j++)
             newBarSet->push_back(info.at(j).toDouble());

@@ -12,6 +12,7 @@
 class BarChartTab: public ChartTab {
 public:
     BarChartTab(Chart*, QWidget* =nullptr);
+    ~BarChartTab();
     void addChartData (const QStringList&) final;
     QPair<QStringList,bool> addChartDataDialog() final;
     bool delChartData (const QString&) final;
@@ -32,7 +33,7 @@ private:
 
     QHBoxLayout* header();
     void setupScroll (Chart*);
-    void dxLayout (Chart*);
+    void setupChart (Chart*);
     void resizeAxis();
 };
 
