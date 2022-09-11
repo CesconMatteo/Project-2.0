@@ -68,14 +68,14 @@ void PieChartTab::setupScroll (Chart* chart) {
             value.precision(2);
         value << std::fixed;
         value << static_cast<PieSlice*>(*it)->getValue();
-        QLineEdit* valueEdit = new QLineEdit(QString::fromStdString(value.str()));
+        QLabel* valueEdit = new QLabel(QString("Valore: ").append(QString::fromStdString(value.str())));
         valueEdit->setAlignment(Qt::AlignCenter);
         secondLayout->addWidget(valueEdit);
         QList<QWidget*> tmpFC = QList<QWidget*>();
         tmpFC.push_back(valueEdit);
         firstColoumn.push_back(tmpFC);
 
-        QLineEdit* percEdit = new QLineEdit();
+        QLabel* percEdit = new QLabel();
         percEdit->setAlignment(Qt::AlignCenter);
         secondLayout->addWidget(percEdit);
         QList<QWidget*> tmpSC = QList<QWidget*>();
@@ -150,7 +150,7 @@ void PieChartTab::updatePercentage() {
             value.precision(1);
         value << std::fixed;
         value << slices.at(i)->percentage() * 100;
-        static_cast<QLineEdit*>(secondColoumn.at(i).at(0))->setText(QString::fromStdString(value.str()));
+        static_cast<QLabel*>(secondColoumn.at(i).at(0))->setText(QString("Percentuale: ").append(QString::fromStdString(value.str())).append("%"));
     }
 
     for (int i=0; i < chartDataNames.size(); i++) {
@@ -221,14 +221,14 @@ void PieChartTab::addChartData(const QStringList& info) {
             value.precision(2);
         value << std::fixed;
         value << info.at(1).toDouble();
-        QLineEdit* valueEdit = new QLineEdit(QString::fromStdString(value.str()));
+        QLabel* valueEdit = new QLabel(QString("Valore: ").append(QString::fromStdString(value.str())));
         valueEdit->setAlignment(Qt::AlignCenter);
         secondLayout->addWidget(valueEdit);
         QList<QWidget*> tmpFC = QList<QWidget*>();
         tmpFC.push_back(valueEdit);
         firstColoumn.push_back(tmpFC);
 
-        QLineEdit* percEdit = new QLineEdit();
+        QLabel* percEdit = new QLabel();
         percEdit->setAlignment(Qt::AlignCenter);
         QList<QWidget*> tmp2 = QList<QWidget*>();
         tmp2.push_back(percEdit);
@@ -345,7 +345,7 @@ QPair<QString, QString> PieChartTab::modChartData(const QString& chartDataName) 
     chartDataNames.at(k)->setText(newChartDataName->text());
 
 
-    static_cast<QLineEdit*>(firstColoumn.at(k).at(0))->setText(newValue->text());
+    static_cast<QLabel*>(firstColoumn.at(k).at(0))->setText(QString("Valore: ").append(newValue->text()));
 
     for (auto i: static_cast<QPieSeries*>(chartView->chart()->series().at(0))->slices()){
         QString str = QString::fromStdString(i->label().toStdString().substr(0, i->label().toStdString().find(' ')));
