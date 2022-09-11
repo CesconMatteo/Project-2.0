@@ -219,7 +219,13 @@ QStringList BarChartTab::addChartDataDialog() {
                 results.push_back(i->text());
             else
                 results.push_back("0");
-    }
+    } else
+        return QStringList();
+
+    for (auto i: chartDataNames)
+        if (i->text() == results.at(0))
+            return QStringList("errore");
+
     return results;
 }
 

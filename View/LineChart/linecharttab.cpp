@@ -169,9 +169,16 @@ QStringList LineChartTab::addChartDataDialog() {
     dialogWindow.setLayout(layout);
     title->setFocus();
     QStringList tmp = QStringList();
-    if (dialogWindow.exec() == QDialog::Accepted)
+    if (dialogWindow.exec() == QDialog::Accepted) {
         if (!title->text().isEmpty())
             tmp.push_back(title->text());
+    } else
+        return QStringList();
+
+    for (auto i: chartDataNames)
+        if (i->text() == tmp.at(0))
+            return QStringList("errore");
+
     return tmp;
 }
 

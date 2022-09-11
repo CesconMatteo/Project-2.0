@@ -279,6 +279,10 @@ void MainWidget::closeEvent (QCloseEvent* e) {
 QStringList MainWidget::addChartData() {
     QStringList tmp = static_cast<ChartTab*>(tab->currentWidget())->addChartDataDialog();
     if (!tmp.isEmpty()) {
+        if (tmp.size() == 1) {
+            errorDialog("Nome già inserito");
+            return QStringList();
+        }
         static_cast<ChartTab*>(tab->currentWidget())->addChartData(tmp);
         QPushButton* btn = static_cast<ChartTab*>(tab->currentWidget())->getChartDataOptionButtons().last();
         connect (btn, SIGNAL(clicked()), controller, SLOT(chartDataOptions()));

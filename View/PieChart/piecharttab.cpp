@@ -178,7 +178,13 @@ QStringList PieChartTab::addChartDataDialog() {
     if (dialogWindow.exec() == QDialog::Accepted) {
         results.push_back(name->text());
         results.push_back(value->text());
-    }
+    } else
+        return QStringList();
+
+    for (auto i: chartDataNames)
+        if (i->text() == results.at(0))
+            return QStringList("errore");
+
     return results;
 }
 
