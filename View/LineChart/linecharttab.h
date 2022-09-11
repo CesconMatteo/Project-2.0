@@ -31,6 +31,8 @@ private:
     void setupScroll (Chart*);
     QChartView* dxLayout (Chart*);
     void resizeAxis();
+
+    bool eventFilter (QObject*, QEvent*) final;
 };
 
 #endif

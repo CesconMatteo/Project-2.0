@@ -50,7 +50,6 @@ void LineChartTab::setupScroll (Chart* chart) {
         font.setBold(true);
         font.setPointSize(20);
         label->setFont(font);
-        label->setFixedWidth(150);
         label->setAlignment(Qt::AlignCenter);
         lineNameLayout->addWidget(label);
         chartDataNames.push_back(label);
@@ -122,9 +121,11 @@ void LineChartTab::setupScroll (Chart* chart) {
     scroll = new QScrollArea();
     scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-    scroll->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    scroll->setSizeAdjustPolicy(QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents);
+    scroll->horizontalScrollBar()->setEnabled(false);
+    scroll->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    scroll->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
     scroll->setWidget(scrollWidget);
+    scroll->widget()->installEventFilter(this);
 }
 
 QChartView* LineChartTab::dxLayout (Chart* chart) {
@@ -432,6 +433,7 @@ QList<double> LineChartTab::addNewPoint (const QString& chartDataName) {
     static_cast<QLineSeries*>(chartView->chart()->series().at(index))->append(res.at(0),res.at(1));
 
     resizeAxis();
+
     return res;
 }
 
@@ -542,4 +544,10 @@ void LineChartTab::resizeAxis() {
         chartView->chart()->axes(Qt::Orientation::Horizontal).at(0)->setRange(minX, maxX);
         chartView->chart()->axes(Qt::Orientation::Vertical).at(0)->setRange(minY, maxY);
     }
+}
+
+bool LineChartTab::eventFilter(QObject* obj, QEvent* e) {
+    if (obj == scroll->widget() && e->type() == QEvent::Resize)
+        scroll->setMinimumWidth(scroll->widget()->width() + scroll->verticalScrollBar()->width());
+    return false;
 }
