@@ -21,7 +21,7 @@ public:
     void clear();
     bool empty() const;
     void push_back (const QPair<double,double>&);
-    void erase (QList<QPair<double,double>>::ConstIterator);
+    void erase (QList<QPair<double,double>>::Iterator);
     void replace (const int&, const QPair<double,double>&);
     void removeAt (const int&);
 

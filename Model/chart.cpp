@@ -54,7 +54,7 @@ bool Chart::empty() const {
     return data.empty();
 }
 
-void Chart::erase(QList<ChartData*>::ConstIterator it) {
+void Chart::erase(QList<ChartData*>::Iterator it) {
     data.erase(it);
 }
 

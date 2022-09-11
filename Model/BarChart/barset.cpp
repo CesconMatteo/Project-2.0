@@ -38,7 +38,7 @@ void BarSet::push_back(const double& x) {
     values.push_back(x);
 }
 
-void BarSet::erase(QList<double>::ConstIterator it) {
+void BarSet::erase(QList<double>::Iterator it) {
     values.erase(it);
 }
 

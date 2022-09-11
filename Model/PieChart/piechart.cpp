@@ -76,7 +76,7 @@ bool PieChart::load (const QString& _path) {
 
 bool PieChart::operator== (PieChart right) const {
     /* DEVO CONTROLLARE CHE NON CE NE SIA NESSUNO DI DIVERSO => TUTTI UGUALI */
-    for (unsigned int i=0; i< data.size(); i++) {
+    for (int i=0; i< data.size(); i++) {
         PieSlice a = *static_cast<const PieSlice*>(at(i));
         PieSlice b = *static_cast<const PieSlice*>(right.at(i));
         if (a != b)

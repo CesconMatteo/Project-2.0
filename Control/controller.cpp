@@ -106,9 +106,9 @@ void Controller::delChartData (QString chartDataName) {
         if (view->delChartData(chartDataName))                                  // RIMOZIONE CORRETTA DAL VIEW
             view->okDialog("Rimozione corretta");
         else
-            view->errorDialog("Rimozione errata");
+            view->errorDialog("Errore!");
     else
-        view->errorDialog("Errore!");
+        view->errorDialog("Errore! Elemento non presente nel file");
 }
 
 /* INFO.SECOND E' IL NOME DEL CHARTDATA */

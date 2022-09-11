@@ -38,7 +38,7 @@ void Line::push_back(const QPair<double,double>& x) {
     points.push_back(x);
 }
 
-void Line::erase(QList<QPair<double,double>>::ConstIterator it) {
+void Line::erase(QList<QPair<double,double>>::Iterator it) {
     points.erase(it);
 }
 

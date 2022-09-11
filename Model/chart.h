@@ -21,7 +21,7 @@ public:
     void clear();
     bool empty() const;
     virtual bool push_back (ChartData*) =0;
-    void erase (QList<ChartData*>::ConstIterator);
+    void erase (QList<ChartData*>::Iterator);
     void replace (const int&, ChartData*);
     void removeAt (const int&);
 
