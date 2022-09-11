@@ -277,13 +277,13 @@ void MainWidget::closeEvent (QCloseEvent* e) {
 
 /* RIMBALZO CHIAMATE */
 QStringList MainWidget::addChartData() {
-    QStringList tmp = static_cast<ChartTab*>(tab->currentWidget())->addChartDataDialog();
-    if (!tmp.isEmpty()) {
-        if (tmp.size() == 1) {
+    QPair<QStringList,bool> tmp = static_cast<ChartTab*>(tab->currentWidget())->addChartDataDialog();
+    if (!tmp.first.isEmpty()) {
+        if (!tmp.second) {
             errorDialog("Nome già inserito");
             return QStringList();
         }
-        static_cast<ChartTab*>(tab->currentWidget())->addChartData(tmp);
+        static_cast<ChartTab*>(tab->currentWidget())->addChartData(tmp.first);
         QPushButton* btn = static_cast<ChartTab*>(tab->currentWidget())->getChartDataOptionButtons().last();
         connect (btn, SIGNAL(clicked()), controller, SLOT(chartDataOptions()));
         if (dynamic_cast<BarChartTab*>(tab->currentWidget())) {
@@ -292,7 +292,7 @@ QStringList MainWidget::addChartData() {
                 connect (i, SIGNAL(clicked()), controller, SLOT(subOptions()));
         }
     }
-    return tmp;
+    return tmp.first;
 }
 
 void MainWidget::connectChartDataButtons() {

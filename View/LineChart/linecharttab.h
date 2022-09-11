@@ -16,7 +16,7 @@ class LineChartTab: public ChartTab {
 public:
     LineChartTab(Chart*, QWidget* =nullptr);
     void addChartData (const QStringList&) final;
-    QStringList addChartDataDialog() final;
+    QPair<QStringList,bool> addChartDataDialog() final;
     bool delChartData (const QString&) final;
     QPair<QString,QString> showChartDataOptions (QPushButton*) final;
     QPair<QString,QString> modChartData (const QString&) final;

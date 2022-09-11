@@ -159,7 +159,7 @@ void PieChartTab::updatePercentage() {
 
 }
 
-QStringList PieChartTab::addChartDataDialog() {
+QPair<QStringList,bool> PieChartTab::addChartDataDialog() {
     QDialog dialogWindow(this);
     dialogWindow.setWindowTitle("Nuova fetta");
     QFormLayout* layout = new QFormLayout();
@@ -179,13 +179,13 @@ QStringList PieChartTab::addChartDataDialog() {
         results.push_back(name->text());
         results.push_back(value->text());
     } else
-        return QStringList();
+        return QPair<QStringList,bool>(QStringList(),true);
 
     for (auto i: chartDataNames)
         if (i->text() == results.at(0))
-            return QStringList("errore");
+            return QPair<QStringList,bool>(results,false);
 
-    return results;
+    return QPair<QStringList,bool>(results,true);
 }
 
 void PieChartTab::addChartData(const QStringList& info) {

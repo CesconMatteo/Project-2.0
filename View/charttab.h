@@ -12,7 +12,7 @@ public:
     QPushButton* getNewChartDataBtn() const;
     QPushButton* getDelChartDataBtn() const;
 
-    virtual QStringList addChartDataDialog() =0;
+    virtual QPair<QStringList,bool> addChartDataDialog() =0;
     virtual void addChartData (const QStringList&) =0;
     QString delChartDataDialog();
     virtual bool delChartData (const QString&) =0;

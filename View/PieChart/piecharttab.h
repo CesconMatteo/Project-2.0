@@ -16,7 +16,7 @@ class PieChartTab: public ChartTab {
 public:
     PieChartTab(Chart*, QWidget* =nullptr);
     void addChartData (const QStringList&);
-    QStringList addChartDataDialog() final;
+    QPair<QStringList,bool> addChartDataDialog() final;
     bool delChartData (const QString&) final;
     QPair<QString,QString> modChartData (const QString&) final;
 private:

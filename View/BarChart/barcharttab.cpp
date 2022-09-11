@@ -185,7 +185,7 @@ void BarChartTab::resizeAxis() {
     static_cast<QValueAxis*>(chartView->chart()->axes(Qt::Vertical).at(0))->setRange(min,max);
 }
 
-QStringList BarChartTab::addChartDataDialog() {
+QPair<QStringList,bool> BarChartTab::addChartDataDialog() {
     QDialog dialogWindow(this);
     dialogWindow.setWindowTitle("Nuovo set");
     QFormLayout* layout = new QFormLayout();
@@ -212,7 +212,7 @@ QStringList BarChartTab::addChartDataDialog() {
     QStringList results = QStringList();
     if (dialogWindow.exec() == QDialog::Accepted) {
         if (setName->text().isEmpty())
-            return results;
+            return QPair<QStringList,bool>(QStringList(),true);
         results.push_back(setName->text());
         for (auto i: edits)
             if (!i->text().isEmpty())
@@ -220,13 +220,13 @@ QStringList BarChartTab::addChartDataDialog() {
             else
                 results.push_back("0");
     } else
-        return QStringList();
+        return QPair<QStringList,bool>(QStringList(),true);
 
     for (auto i: chartDataNames)
         if (i->text() == results.at(0))
-            return QStringList("errore");
+            return QPair<QStringList,bool>(results,false);
 
-    return results;
+    return QPair<QStringList,bool>(results,true);;
 }
 
 void BarChartTab::addChartData(const QStringList& info) {

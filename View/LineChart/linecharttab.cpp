@@ -156,7 +156,7 @@ QChartView* LineChartTab::dxLayout (Chart* chart) {
     return chartView;
 }
 
-QStringList LineChartTab::addChartDataDialog() {
+QPair<QStringList,bool> LineChartTab::addChartDataDialog() {
     QDialog dialogWindow(this);
     dialogWindow.setWindowTitle("Nuova linea");
     QFormLayout* layout = new QFormLayout();
@@ -173,13 +173,14 @@ QStringList LineChartTab::addChartDataDialog() {
         if (!title->text().isEmpty())
             tmp.push_back(title->text());
     } else
-        return QStringList();
+        return QPair<QStringList,bool>(QStringList(),true);
 
     for (auto i: chartDataNames)
-        if (i->text() == tmp.at(0))
-            return QStringList("errore");
+        if (i->text() == tmp.at(0)) {
+            return QPair<QStringList,bool>(tmp,false);
+        }
 
-    return tmp;
+    return QPair<QStringList,bool>(tmp,true);
 }
 
 /* DA CONTROLLARE PER EVENTUALI LAYOUT CHE RESTANO IN MEMORIA */
