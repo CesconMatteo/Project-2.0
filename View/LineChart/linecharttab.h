@@ -30,6 +30,7 @@ private:
     QHBoxLayout* header();
     void setupScroll (Chart*);
     QChartView* dxLayout (Chart*);
+    void resizeAxis();
 };
 
 #endif

@@ -215,6 +215,7 @@ void LineChartTab::addChartData(const QStringList& info) {
         subOptionButtons.push_back(QList<QPushButton*>());
 
         static_cast<QVBoxLayout*>(scroll->widget()->layout())->addLayout(newLayout);
+        resizeAxis();
 
     } else {
         LineChart* x = new LineChart();
@@ -278,6 +279,7 @@ bool LineChartTab::delChartData (const QString& lineName) {
             zeroDataTab("Inserire una linea");
             static_cast<QVBoxLayout*>(layout())->addWidget(zeroDataLabel);
         }
+        resizeAxis();
 
         return true;
     }
@@ -330,6 +332,7 @@ QPair<QString, QString> LineChartTab::modChartData(const QString& chartDataName)
         if (i->name() == chartDataName)
             i->setName(newChartDataName->text());
 
+    resizeAxis();
     return QPair<QString,QString>(newChartDataName->text(),"");
 }
 
@@ -411,6 +414,7 @@ QList<double> LineChartTab::addNewPoint (const QString& chartDataName) {
 
     static_cast<QLineSeries*>(chartView->chart()->series().at(index))->append(res.at(0),res.at(1));
 
+    resizeAxis();
     return res;
 }
 
@@ -447,6 +451,7 @@ QPair<QString,int> LineChartTab::deletePoint() {
 
     static_cast<QLineSeries*>(chartView->chart()->series().at(buttonIndexes.first))->remove(buttonIndexes.second);
 
+    resizeAxis();
     return QPair<QString,int>(chartDataNames.at(buttonIndexes.first)->text(),buttonIndexes.second);
 }
 
@@ -494,5 +499,27 @@ QList<QVariant> LineChartTab::modSubChartData() {
     res.push_back(chartDataNames.at(buttonIndexes.first)->text());
     res.push_back(buttonIndexes.second);
 
+    resizeAxis();
     return res;
+}
+
+void LineChartTab::resizeAxis() {
+    double minX = std::numeric_limits<double>::max();
+    double maxX = std::numeric_limits<double>::min();
+    double minY = std::numeric_limits<double>::max();
+    double maxY = std::numeric_limits<double>::min();
+    for (int i=0; i < firstColoumn.size(); i++) {
+        for (int j=0; j < firstColoumn.at(i).size(); j++) {
+            if (static_cast<QLineEdit*>(firstColoumn.at(i).at(j))->text().toDouble() > maxX)
+                maxX = static_cast<QLineEdit*>(firstColoumn.at(i).at(j))->text().toDouble();
+            if (static_cast<QLineEdit*>(firstColoumn.at(i).at(j))->text().toDouble() < minX)
+                minX = static_cast<QLineEdit*>(firstColoumn.at(i).at(j))->text().toDouble();
+            if (static_cast<QLineEdit*>(secondColoumn.at(i).at(j))->text().toDouble() > maxY)
+                maxY = static_cast<QLineEdit*>(secondColoumn.at(i).at(j))->text().toDouble();
+            if (static_cast<QLineEdit*>(secondColoumn.at(i).at(j))->text().toDouble() < minY)
+                minY = static_cast<QLineEdit*>(secondColoumn.at(i).at(j))->text().toDouble();
+        }
+    }
+    chartView->chart()->axes(Qt::Orientation::Horizontal).at(0)->setRange(minX, maxX);
+    chartView->chart()->axes(Qt::Orientation::Vertical).at(0)->setRange(minY, maxY);
 }
