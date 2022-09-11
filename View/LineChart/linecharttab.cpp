@@ -545,9 +545,3 @@ void LineChartTab::resizeAxis() {
         chartView->chart()->axes(Qt::Orientation::Vertical).at(0)->setRange(minY, maxY);
     }
 }
-
-bool LineChartTab::eventFilter(QObject* obj, QEvent* e) {
-    if (obj == scroll->widget() && e->type() == QEvent::Resize)
-        scroll->setMinimumWidth(scroll->widget()->width() + scroll->verticalScrollBar()->width());
-    return false;
-}

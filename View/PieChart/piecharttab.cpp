@@ -104,6 +104,7 @@ void PieChartTab::setupScroll (Chart* chart) {
     scroll->setWidget(scrollWidget);
     scroll->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     scroll->setSizeAdjustPolicy(QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents);
+    scroll->widget()->installEventFilter(this);
 }
 
 void PieChartTab::dxLayout (Chart* chart) {

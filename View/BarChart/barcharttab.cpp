@@ -132,6 +132,7 @@ void BarChartTab::setupScroll (Chart* chart) {
     scroll->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     scroll->setSizeAdjustPolicy(QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents);
     scroll->setWidget(scrollWidget);
+    scroll->widget()->installEventFilter(this);
 }
 
 void BarChartTab::dxLayout (Chart* chart) {

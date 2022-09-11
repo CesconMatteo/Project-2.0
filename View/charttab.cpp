@@ -91,3 +91,9 @@ QPair<QAction*, QAction*> ChartTab::showSubOptions (QPushButton*) {
 QList<QVariant> ChartTab::modSubChartData() {
     return QList<QVariant>();
 }
+
+bool ChartTab::eventFilter(QObject* obj, QEvent* e) {
+    if (obj == scroll->widget() && e->type() == QEvent::Resize)
+        scroll->setMinimumWidth(scroll->widget()->width() + scroll->verticalScrollBar()->width());
+    return false;
+}

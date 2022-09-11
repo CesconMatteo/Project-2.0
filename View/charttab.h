@@ -53,6 +53,7 @@ protected:
     QFrame* createSeparator();
     void zeroDataTab (const QString&);
     QLabel* zeroDataLabel;
+    bool eventFilter(QObject*, QEvent*) final;
 };
 
 #endif
