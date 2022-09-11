@@ -16,10 +16,6 @@ void ChartTab::zeroDataTab (const QString& string) {
         zeroDataLabel->setStyleSheet("font: 20pt;");
 }
 
-void ChartTab::resizeEvent(QResizeEvent*) {
-
-}
-
 QPushButton* ChartTab::getNewChartDataBtn() const {
     return newChartDataBtn;
 }
@@ -59,6 +55,14 @@ const QList<QPushButton*>& ChartTab::getChartDataOptionButtons() const {
     return chartDataOptionButtons;
 }
 
+const QList<QList<QPushButton*>>& ChartTab::getSubOptionButtons() const {
+    return subOptionButtons;
+}
+
+void ChartTab::execMenu() {
+    menu->exec();
+}
+
 QPair<QString,QString> ChartTab::showChartDataOptions (QPushButton* sender) {
     QMenu menu("Opzioni", this);
     QAction* modifyAction = new QAction("Modifica", this);
@@ -74,4 +78,12 @@ QPair<QString,QString> ChartTab::showChartDataOptions (QPushButton* sender) {
                 return QPair<QString,QString>(x->text(),chartDataNames.at(i)->text());
     }
     return QPair<QString,QString>();
+}
+
+QPair<QAction*, QAction*> ChartTab::showSubOptions (QPushButton*) {
+    return QPair<QAction*,QAction*>(nullptr,nullptr);
+}
+
+QList<QVariant> ChartTab::modSubChartData() {
+    return QList<QVariant>();
 }

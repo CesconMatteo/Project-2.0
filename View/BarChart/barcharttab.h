@@ -16,8 +16,19 @@ public:
     QStringList addChartDataDialog() final;
     bool delChartData (const QString&) final;
     QPair<QString,QString> modChartData (const QString&) final;
+    QPair<QAction*,QAction*> showSubOptions (QPushButton*) final;
+    QList<QVariant> modSubChartData() final;
+
+    QString addCategory();
+    QString delCategory();
+
+    QPushButton* getNewCatBtn() const;
+    QPushButton* getDelCatBtn() const;
+
 private:
     QStringList categories;
+    QPushButton* newCatBtn;
+    QPushButton* delCatBtn;
 
     QHBoxLayout* header();
     void setupScroll (Chart*);

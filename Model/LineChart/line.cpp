@@ -46,6 +46,10 @@ void Line::replace (const int& pos, const QPair<double,double>& x) {
     points.replace(pos, x);
 }
 
+void Line::removeAt(const int& i) {
+    points.removeAt(i);
+}
+
 bool Line::operator== (Line right) const {
     return points == right.points;
 }

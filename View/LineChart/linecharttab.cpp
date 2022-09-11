@@ -109,6 +109,7 @@ void LineChartTab::setupScroll (Chart* chart) {
         QFrame* separator = createSeparator();
         chartDataSeparators.push_back(separator);
 
+        chartDataLayouts.push_back(externalLayout);
         dataLayout->addLayout(externalLayout);
         dataLayout->addWidget(separator);
     }
@@ -146,6 +147,8 @@ QChartView* LineChartTab::dxLayout (Chart* chart) {
 
     /* GRAPHIC OPTIONS */
     graphicChart->createDefaultAxes();
+    static_cast<QValueAxis*>(graphicChart->axes(Qt::Orientation::Horizontal).at(0))->setTickCount(10);
+    static_cast<QValueAxis*>(graphicChart->axes(Qt::Orientation::Vertical).at(0))->setTickCount(10);
     graphicChart->axes(Qt::Orientation::Horizontal).at(0)->setTitleText("X");
     graphicChart->axes(Qt::Orientation::Vertical).at(0)->setTitleText("Y");
     chartView = new QChartView(graphicChart);
@@ -182,6 +185,7 @@ void LineChartTab::addChartData(const QStringList& info) {
 
         QVBoxLayout* newLayout = new QVBoxLayout();
         QHBoxLayout* internalLayout = new QHBoxLayout();
+        QVBoxLayout* externalLayout = new QVBoxLayout();
 
         QLabel* label = new QLabel(info.at(0));                         // ADD LABEL
         QFont font = label->font();
@@ -193,11 +197,14 @@ void LineChartTab::addChartData(const QStringList& info) {
         internalLayout->addWidget(label);
         chartDataNames.push_back(label);
 
+        chartDataLayouts.push_back(externalLayout);
+        externalLayout->addLayout(internalLayout);
+
         QPushButton* setOptionBtn = new QPushButton("Opzioni");         // ADD BUTTON
         internalLayout->addWidget(setOptionBtn);
         chartDataOptionButtons.push_back(setOptionBtn);
 
-        newLayout->addLayout(internalLayout);
+        newLayout->addLayout(externalLayout);
 
         QFrame* separator = createSeparator();
         newLayout->addWidget(separator);
@@ -252,6 +259,7 @@ bool LineChartTab::delChartData (const QString& lineName) {
         delete chartDataOptionButtons.at(k);
         delete chartDataNames.at(k);
         delete chartDataSeparators.at(k);
+        delete chartDataLayouts.at(k);
 
         firstColoumn.removeAt(k);
         secondColoumn.removeAt(k);
@@ -259,6 +267,7 @@ bool LineChartTab::delChartData (const QString& lineName) {
         chartDataOptionButtons.removeAt(k);
         chartDataNames.removeAt(k);
         chartDataSeparators.removeAt(k);
+        chartDataLayouts.removeAt(k);
 
         /* CONTROLLO SE E' VUOTO */
         if (firstColoumn.size() == 0) {
@@ -322,4 +331,168 @@ QPair<QString, QString> LineChartTab::modChartData(const QString& chartDataName)
             i->setName(newChartDataName->text());
 
     return QPair<QString,QString>(newChartDataName->text(),"");
+}
+
+QList<double> LineChartTab::addNewPoint (const QString& chartDataName) {
+
+    QDialog dialogWindow(this);
+    dialogWindow.setWindowTitle("Nuovo punto");
+
+    QFormLayout* layout = new QFormLayout();
+
+    QLineEdit* x = new QLineEdit();
+    layout->addRow("X:", x);
+    x->setValidator(new QRegularExpressionValidator(QRegularExpression("[+-]?([0-9]*[.])?[0-9]+")));
+    QLineEdit* y = new QLineEdit();
+    layout->addRow("Y:", y);
+    y->setValidator(new QRegularExpressionValidator(QRegularExpression("[+-]?([0-9]*[.])?[0-9]+")));
+
+    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialogWindow);
+    connect(&buttonBox, SIGNAL(accepted()), &dialogWindow, SLOT(accept()));
+    connect(&buttonBox, SIGNAL(rejected()), &dialogWindow, SLOT(reject()));
+    layout->addRow(&buttonBox);
+
+    dialogWindow.setLayout(layout);
+    x->setFocus();
+
+    QList<double> res = QList<double>();
+    if (dialogWindow.exec() == QDialog::Accepted) {
+        if (x->text().isEmpty())
+            res.push_back(0);
+        else
+            res.push_back(x->text().toDouble());
+        if (y->text().isEmpty())
+            res.push_back(0);
+        else
+            res.push_back(y->text().toDouble());
+    } else
+        return res;
+
+    int index;
+    for (index=0; index < chartDataNames.size(); index++)
+        if (chartDataNames.at(index)->text() == chartDataName)
+            break;
+
+    res.push_back(index);
+
+    QHBoxLayout* internalLayout = new QHBoxLayout();
+    /* LINEEDIT X */
+    stringstream xStream;
+    if (fmod(res.at(0), 1.0) == 0)
+        xStream.precision(0);
+    else
+        xStream.precision(2);
+    xStream << std::fixed;
+    xStream << res.at(0);
+    QLineEdit* xEdit = new QLineEdit(QString::fromStdString(xStream.str()));
+    xEdit->setAlignment(Qt::AlignCenter);
+    internalLayout->addWidget(xEdit);
+    firstColoumn[index].push_back(xEdit);
+
+    /* LINEEDIT Y */
+    stringstream yStream;
+    if (fmod(res.at(1), 1.0) == 0)
+        yStream.precision(0);
+    else
+        yStream.precision(2);
+    yStream << std::fixed;
+    yStream << res.at(1);
+    QLineEdit* yEdit = new QLineEdit(QString::fromStdString(yStream.str()));
+    yEdit->setAlignment(Qt::AlignCenter);
+    internalLayout->addWidget(yEdit);
+    secondColoumn[index].push_back(yEdit);
+
+    /* BUTTON */
+    QPushButton* btn = new QPushButton("···");
+    internalLayout->addWidget(btn);
+    subOptionButtons[index].push_back(btn);
+
+    chartDataLayouts.at(index)->addLayout(internalLayout);
+
+    static_cast<QLineSeries*>(chartView->chart()->series().at(index))->append(res.at(0),res.at(1));
+
+    return res;
+}
+
+QPair<QAction*,QAction*> LineChartTab::showSubOptions(QPushButton* sender) {
+    menu = new QMenu("Opzioni", this);
+    QAction* modifyAction = new QAction("Modifica", this);
+    QAction* deleteAction = new QAction("Elimina", this);
+    menu->addAction(modifyAction);
+    menu->addAction(deleteAction);
+    QPoint a = sender->mapToGlobal(QPoint(sender->width()/2, sender->height()/2));
+    menu->move(a.x(), a.y());
+
+    int i = -1;
+    int j = -1;
+    for (int _i = 0; _i < subOptionButtons.size(); _i++)
+        for (int _j = 0; _j < subOptionButtons.at(_i).size(); _j++)
+            if (subOptionButtons.at(_i).at(_j) == sender) {
+                i = _i;
+                j = _j;
+            }
+    buttonIndexes = QPair<int,int>(i,j);
+
+    return QPair<QAction*,QAction*>(modifyAction,deleteAction);
+}
+
+QPair<QString,int> LineChartTab::deletePoint() {
+    delete firstColoumn.at(buttonIndexes.first).at(buttonIndexes.second);
+    delete secondColoumn.at(buttonIndexes.first).at(buttonIndexes.second);
+    delete subOptionButtons.at(buttonIndexes.first).at(buttonIndexes.second);
+
+    firstColoumn[buttonIndexes.first].removeAt(buttonIndexes.second);
+    secondColoumn[buttonIndexes.first].removeAt(buttonIndexes.second);
+    subOptionButtons[buttonIndexes.first].removeAt(buttonIndexes.second);
+
+    static_cast<QLineSeries*>(chartView->chart()->series().at(buttonIndexes.first))->remove(buttonIndexes.second);
+
+    return QPair<QString,int>(chartDataNames.at(buttonIndexes.first)->text(),buttonIndexes.second);
+}
+
+QList<QVariant> LineChartTab::modSubChartData() {
+
+    QDialog dialogWindow(this);
+    dialogWindow.setWindowTitle("Modifica punto");
+
+    QFormLayout* layout = new QFormLayout();
+
+    QLineEdit* x = new QLineEdit();
+    layout->addRow("X:", x);
+    x->setValidator(new QRegularExpressionValidator(QRegularExpression("[+-]?([0-9]*[.])?[0-9]+")));
+    QLineEdit* y = new QLineEdit();
+    layout->addRow("Y:", y);
+    y->setValidator(new QRegularExpressionValidator(QRegularExpression("[+-]?([0-9]*[.])?[0-9]+")));
+
+    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialogWindow);
+    connect(&buttonBox, SIGNAL(accepted()), &dialogWindow, SLOT(accept()));
+    connect(&buttonBox, SIGNAL(rejected()), &dialogWindow, SLOT(reject()));
+    layout->addRow(&buttonBox);
+
+    dialogWindow.setLayout(layout);
+    x->setFocus();
+
+    QList<QVariant> res = QList<QVariant>();
+    if (dialogWindow.exec() == QDialog::Accepted) {
+        if (x->text().isEmpty())
+            res.push_back(0);
+        else
+            res.push_back(x->text().toDouble());
+        if (y->text().isEmpty())
+            res.push_back(0);
+        else
+            res.push_back(y->text().toDouble());
+    } else
+        return QList<QVariant>();
+
+    static_cast<QLineEdit*>(firstColoumn.at(buttonIndexes.first).at(buttonIndexes.second))->setText(QString::number(res.at(0).toDouble()));
+    static_cast<QLineEdit*>(secondColoumn.at(buttonIndexes.first).at(buttonIndexes.second))->setText(QString::number(res.at(1).toDouble()));
+
+    static_cast<QLineSeries*>(chartView->chart()->series().at(buttonIndexes.first))->remove(buttonIndexes.second);
+    static_cast<QLineSeries*>(chartView->chart()->series().at(buttonIndexes.first))->insert(buttonIndexes.second, QPoint(res.at(0).toDouble(),res.at(1).toDouble()));
+
+    res.push_back(chartDataNames.at(buttonIndexes.first)->text());
+    res.push_back(buttonIndexes.second);
+
+    return res;
 }

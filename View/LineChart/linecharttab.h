@@ -20,6 +20,12 @@ public:
     bool delChartData (const QString&) final;
     QPair<QString,QString> showChartDataOptions (QPushButton*) final;
     QPair<QString,QString> modChartData (const QString&) final;
+    QPair<QAction*,QAction*> showSubOptions (QPushButton*) final;
+
+    QList<double> addNewPoint (const QString& chartDataName);
+    QPair<QString,int> deletePoint();
+    QList<QVariant> modSubChartData() final;
+
 private:
     QHBoxLayout* header();
     void setupScroll (Chart*);

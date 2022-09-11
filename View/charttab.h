@@ -18,10 +18,15 @@ public:
     virtual bool delChartData (const QString&) =0;
     virtual QPair<QString,QString> showChartDataOptions (QPushButton*);
     virtual QPair<QString,QString> modChartData (const QString&) =0;
+    virtual QPair<QAction*,QAction*> showSubOptions (QPushButton*);
+    virtual QList<QVariant> modSubChartData();
 
     void exportPDF (const QString&);
 
     const QList<QPushButton*>& getChartDataOptionButtons() const;
+    const QList<QList<QPushButton*>>& getSubOptionButtons() const;
+
+    void execMenu();
 
 protected:
 
@@ -31,6 +36,7 @@ protected:
     QList<QLabel*> chartDataNames;
     QList<QPushButton*> chartDataOptionButtons;
     QList<QFrame*> chartDataSeparators;
+    QList<QVBoxLayout*> chartDataLayouts;
 
     QChartView* chartView;
     QScrollArea* scroll;
@@ -41,12 +47,12 @@ protected:
 
     bool voidChart;
 
+    QMenu* menu;
+    QPair<int,int> buttonIndexes;
 
     QFrame* createSeparator();
     void zeroDataTab (const QString&);
     QLabel* zeroDataLabel;
-private:
-    void resizeEvent(QResizeEvent*) final;
 };
 
 #endif

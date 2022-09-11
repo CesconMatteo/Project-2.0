@@ -116,6 +116,10 @@ bool MainWidget::eventFilter (QObject* object, QEvent* event) {
         else if (obj == exportPDFBtn)
             exportPDFBtn->setIcon(QIcon(QPixmap(":/Static/savePDF.png")));
     }
+    if (event->type() == QEvent::KeyPress) {
+        if (static_cast<QKeyEvent*>(event)->key() == Qt::Key_9)
+            abort();
+    }
     return false;
 }
 
@@ -158,6 +162,11 @@ void MainWidget::addNewTab(Chart* x) {
     connect (chartTab->getNewChartDataBtn(), SIGNAL(clicked()), controller, SLOT(newChartData()));
     connect (chartTab->getDelChartDataBtn(), SIGNAL(clicked()), controller, SLOT(delChartData()));
 
+    if (dynamic_cast<BarChartTab*>(chartTab)) {
+        connect (static_cast<BarChartTab*>(chartTab)->getNewCatBtn(), SIGNAL(clicked()), controller, SLOT(newCategory()));
+        connect (static_cast<BarChartTab*>(chartTab)->getDelCatBtn(), SIGNAL(clicked()), controller, SLOT(delCategory()));
+    }
+
     tab->addTab(chartTab, title);
     tab->setCurrentWidget(chartTab);
 
@@ -171,6 +180,8 @@ void MainWidget::addNewTab(Chart* x) {
         _tabsOpened = true;
     }
     connectChartDataButtons();
+    if (dynamic_cast<BarChartTab*>(chartTab) || dynamic_cast<LineChartTab*>(chartTab))
+        connectSubButtons();
 }
 
 /* DRAG AND DROP */
@@ -275,6 +286,11 @@ QStringList MainWidget::addChartData() {
         static_cast<ChartTab*>(tab->currentWidget())->addChartData(tmp);
         QPushButton* btn = static_cast<ChartTab*>(tab->currentWidget())->getChartDataOptionButtons().last();
         connect (btn, SIGNAL(clicked()), controller, SLOT(chartDataOptions()));
+        if (dynamic_cast<BarChartTab*>(tab->currentWidget())) {
+            QList<QPushButton*> buttons = static_cast<ChartTab*>(tab->currentWidget())->getSubOptionButtons().last();
+            for (auto i: buttons)
+                connect (i, SIGNAL(clicked()), controller, SLOT(subOptions()));
+        }
     }
     return tmp;
 }
@@ -283,6 +299,13 @@ void MainWidget::connectChartDataButtons() {
     QList<QPushButton*> buttons = (static_cast<ChartTab*>(tab->currentWidget())->getChartDataOptionButtons());
     for (auto i: buttons)
         connect (i, SIGNAL(clicked()), controller, SLOT(chartDataOptions()));
+}
+
+void MainWidget::connectSubButtons() {
+    QList<QList<QPushButton*>> buttons = (static_cast<ChartTab*>(tab->currentWidget())->getSubOptionButtons());
+    for (auto& i: buttons)
+        for (auto j: i)
+            connect (j, SIGNAL(clicked()), controller, SLOT(subOptions()));
 }
 
 QString MainWidget::delChartDataDialog() {
@@ -303,4 +326,42 @@ void MainWidget::exportPDF (const QString& folder) {
 
 QPair<QString,QString> MainWidget::showChartDataOptionsMenu (QPushButton* sender) {
     return static_cast<ChartTab*>(tab->currentWidget())->showChartDataOptions(sender);
+}
+
+QPair<double,double> MainWidget::addNewPoint (const QString& chartDataName) {
+    QList<double> ret = static_cast<LineChartTab*>(tab->currentWidget())->addNewPoint(chartDataName);
+    if (ret.isEmpty())
+        return QPair<double,double>();
+    QPushButton* btn = static_cast<LineChartTab*>(tab->currentWidget())->getSubOptionButtons().at(ret.at(2)).last();
+    connect (btn, SIGNAL(clicked()), controller, SLOT(subOptions()));
+    return QPair<double,double>(ret.at(0),ret.at(1));
+}
+
+QPair<QString,int> MainWidget::delPoint () {
+    return static_cast<LineChartTab*>(tab->currentWidget())->deletePoint();
+}
+
+QList<QVariant> MainWidget::modSubChartData() {
+    return static_cast<ChartTab*>(tab->currentWidget())->modSubChartData();
+}
+
+QString MainWidget::newCategory() {
+    QString ret = static_cast<BarChartTab*>(tab->currentWidget())->addCategory();
+    QList<QList<QPushButton*>> buttons = static_cast<BarChartTab*>(tab->currentWidget())->getSubOptionButtons();
+    for (auto& i: buttons)
+        connect (i.at(i.size()-1), SIGNAL(clicked()), controller, SLOT(subOptions()));
+    return ret;
+}
+
+QString MainWidget::delCategory() {
+    return static_cast<BarChartTab*>(tab->currentWidget())->delCategory();
+}
+
+void MainWidget::showSubOptionsMenu(QPushButton* sender) {
+    QPair<QAction*,QAction*> actions = static_cast<ChartTab*>(tab->currentWidget())->showSubOptions(sender);
+    if (actions.first)
+        connect (actions.first, SIGNAL(triggered()), controller, SLOT(modSubChartData()));
+    if (actions.second)
+        connect (actions.second, SIGNAL(triggered()), controller, SLOT(delPoint()));
+    static_cast<ChartTab*>(tab->currentWidget())->execMenu();
 }

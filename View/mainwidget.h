@@ -65,11 +65,20 @@ public:
     /* RIMBALZO CHIAMATE */
     QStringList addChartData();
     void connectChartDataButtons();
+    void connectSubButtons();
     QString delChartDataDialog();
     bool delChartData (const QString&);
     QPair<QString,QString> modChartData (const QString&);
     void exportPDF (const QString&);
     QPair<QString,QString> showChartDataOptionsMenu (QPushButton*);
+    void showSubOptionsMenu (QPushButton*);
+    QPair<QString,int> delPoint ();
+    QList<QVariant> modSubChartData();
+
+    /* SUBCHARTDATA */
+    QPair<double,double> addNewPoint (const QString&);
+    QString newCategory();
+    QString delCategory();
 
 signals:
     QString fileDropped(QString);

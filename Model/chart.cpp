@@ -21,6 +21,10 @@ void Chart::setPath (const QString& _path) {
     path = _path;
 }
 
+ChartData*& Chart::operator[](const int& i) {
+    return data[i];
+}
+
 /* OPERAZIONI DEL QLIST */
 void Chart::clear() {
     data.clear();
@@ -60,4 +64,8 @@ int Chart::size() const {
 
 void Chart::replace(const int& pos, ChartData* newElement) {
     data.replace(pos, newElement);
+}
+
+void Chart::removeAt (const int& i) {
+    data.removeAt(i);
 }

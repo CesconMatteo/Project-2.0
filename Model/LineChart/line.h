@@ -23,6 +23,7 @@ public:
     void push_back (const QPair<double,double>&);
     void erase (QList<QPair<double,double>>::ConstIterator);
     void replace (const int&, const QPair<double,double>&);
+    void removeAt (const int&);
 
     double maxX() const;
     double minX() const;

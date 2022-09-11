@@ -25,8 +25,12 @@ public slots:
     void newChartData();
     void chartDataOptions();
     void delChartData(QString =0);
-    void modChartData (const QString&);
     void exportPDF();
+    void newCategory();
+    void delCategory();
+    void subOptions();
+    void delPoint();
+    void modSubChartData();
 };
 
 #endif

@@ -115,18 +115,43 @@ void Controller::delChartData (QString chartDataName) {
 void Controller::chartDataOptions() {
     QPair<QString,QString> info = view->showChartDataOptionsMenu(static_cast<QPushButton*>(QObject::sender()));
     if (info.first == "Modifica") {
-        QString a = info.second;
-        modChartData(info.second);
+        QPair<QString,QString> newData = view->modChartData(info.second);
+        model->modifyChartData(view->currentTabIndex(), info.second, newData.first, newData.second.toDouble());
     } else if (info.first == "Nuovo punto") {
-
+        model->addPoint(view->currentTabIndex(), info.second, view->addNewPoint(info.second));
     } else if (info.first == "Elimina")
         delChartData(info.second);
 }
 
-void Controller::modChartData (const QString& chartDataName) {
+void Controller::newCategory() {
+    QString newCat = view->newCategory();
+    if (!newCat.isEmpty())
+        model->addCategory(view->currentTabIndex(),newCat);
+}
 
-    QPair<QString,QString> newData = view->modChartData(chartDataName);
-    model->modifyChartData(view->currentTabIndex(), chartDataName, newData.first, newData.second.toDouble());
+void Controller::delCategory() {
+    QString cat = view->delCategory();
+    if (!cat.isEmpty())
+        model->removeCategory(view->currentTabIndex(),cat);
+}
+
+/* INFO.SECOND E' IL NOME DEL CHARTDATA */
+void Controller::subOptions() {
+    view->showSubOptionsMenu(static_cast<QPushButton*>(QObject::sender()));
+
+}
+
+void Controller::delPoint() {
+    QPair<QString,int> info = view->delPoint();
+    model->removePoint(view->currentTabIndex(), info.first, info.second);
+}
+
+void Controller::modSubChartData() {
+    QList<QVariant> info = view->modSubChartData();
+    if (info.size() == 3)
+        model->modSubChartData(view->currentTabIndex(), info.at(1).toString(), info.at(2).toInt(), QPair<double,double>(info.at(0).toDouble(),0));
+    else if (info.size() == 4)
+        model->modSubChartData(view->currentTabIndex(), info.at(2).toString(), info.at(3).toInt(), QPair<double,double>(info.at(0).toDouble(),info.at(1).toDouble()));
 }
 
 void Controller::exportPDF() {

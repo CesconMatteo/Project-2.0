@@ -26,7 +26,7 @@ public:
     double minValue() const;
     const QStringList& categories() const;
     void addCategory (QString);
-    void removeCategory (QStringList::ConstIterator);
+    void removeCategory (const int&);
 };
 
 #endif

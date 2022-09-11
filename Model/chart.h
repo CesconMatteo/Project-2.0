@@ -23,6 +23,7 @@ public:
     virtual bool push_back (ChartData*) =0;
     void erase (QList<ChartData*>::ConstIterator);
     void replace (const int&, ChartData*);
+    void removeAt (const int&);
 
     /* METODI SPECIFICI */
     virtual bool save() const =0;
@@ -31,6 +32,8 @@ public:
     /* GETTERS-SETTERS */
     const QString& getPath() const;
     void setPath (const QString&);
+
+    ChartData*& operator[](const int&);
 
 /*
     virtual void eraseSingleElement (const int&, const int& =0) =0;

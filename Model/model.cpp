@@ -156,6 +156,44 @@ void Model::modifyChartData (const int& i, const QString& oldName, const QString
         saved[i] = false;
 }
 
+void Model::addPoint (const int& i, const QString& chartDataName, const QPair<double,double>& point) {
+    LineChart* chart = static_cast<LineChart*>(charts.at(i));
+    for (auto it = chart->begin(); it != chart->end(); it++)
+        if ((*it)->getName() == chartDataName)
+            static_cast<class Line*>(*it)->push_back(point);
+}
+
+void Model::removePoint(const int& i, const QString& chartDataName, const int& index) {
+    LineChart* chart = static_cast<LineChart*>(charts.at(i));
+    for (auto it = chart->begin(); it != chart->end(); it++)
+        if ((*it)->getName() == chartDataName)
+            static_cast<class Line*>(*it)->removeAt(index);
+}
+
+void Model::addCategory(const int& i, const QString& category) {
+    static_cast<BarChart*>(charts.at(i))->addCategory(category);
+}
+
+void Model::removeCategory (const int& i, const QString& category) {
+    for (int j=0; j < static_cast<BarChart*>(charts.at(i))->categories().size(); j++)
+        if (static_cast<BarChart*>(charts.at(i))->categories().at(j) == category)
+            static_cast<BarChart*>(charts.at(i))->removeCategory(j);
+}
+
+void Model::modSubChartData(const int& i, const QString& chartDataName, const int& y, const QPair<double, double>& info) {
+    if (dynamic_cast<LineChart*>(charts.at(i))) {
+        LineChart* chart = static_cast<LineChart*>(charts.at(i));
+        for (auto it = chart->begin(); it != chart->end(); it++)
+            if ((*it)->getName() == chartDataName)
+                static_cast<class Line*>(*it)->replace(y, info);
+    } else if (dynamic_cast<BarChart*>(charts.at(i))) {
+        BarChart* chart = static_cast<BarChart*>(charts.at(i));
+        for (auto it = chart->begin(); it != chart->end(); it++)
+            if ((*it)->getName() == chartDataName)
+                static_cast<BarSet*>(*it)->replace(y,info.first);
+    }
+}
+
 Chart* Model::last() {
     return charts.last();
 }

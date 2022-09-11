@@ -35,7 +35,7 @@ bool BarChart::save() const {
         macroObj.insert("Type","BarChart");
 
         QJsonArray catArray;
-        for (auto i: _categories)
+        for (auto& i: _categories)
             catArray.push_back(i);
         macroObj.insert("Categories", catArray);
 
@@ -140,8 +140,12 @@ const QStringList& BarChart::categories() const {
 
 void BarChart::addCategory (QString x) {
     _categories.push_back(x);
+    for (auto i: data)
+        static_cast<BarSet*>(i)->push_back(0);
 }
 
-void BarChart::removeCategory (QStringList::ConstIterator it) {
-    _categories.erase(it);
+void BarChart::removeCategory (const int& index) {
+    _categories.removeAt(index);
+    for (auto j: data)
+        static_cast<BarSet*>(j)->removeAt(index);
 }

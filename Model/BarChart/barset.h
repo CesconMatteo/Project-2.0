@@ -21,6 +21,7 @@ public:
     bool empty() const;
     void push_back (const double&);
     void erase (QList<double>::ConstIterator);
+    void removeAt (const int&);
     void replace (const int&, const double&);
 
     double maxValue() const;

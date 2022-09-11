@@ -332,7 +332,7 @@ QPair<QString, QString> PieChartTab::modChartData(const QString& chartDataName) 
 
     if (!(dialogWindow.exec() == QDialog::Accepted))
         return QPair<QString,QString>();
-    if (newChartDataName->text().isEmpty() || newChartDataName->text() == chartDataName)
+    if (newChartDataName->text().isEmpty())
         return QPair<QString,QString>();
 
     chartDataNames.at(k)->setText(newChartDataName->text());

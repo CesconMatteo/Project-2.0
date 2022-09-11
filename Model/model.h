@@ -38,10 +38,14 @@ public:
     /* CHARTDATA RELATED */
     void addChartData (const int&, const QStringList&);
     bool removeChartData (const int&, const QString&);
-    void modifyChartData (const int&, const QString&, const QString&, const double& =0);
+    void modifyChartData (const int&, const QString&, const QString&, const double&);
 
     /* ELEMENTS OF CHARTDATA */
-    /* AGGIUNTA DI UN PUNTO/ SINGOLO DOUBLE */
+    void addPoint (const int&, const QString&, const QPair<double,double>&);
+    void removePoint (const int&, const QString&, const int&);
+    void addCategory (const int&, const QString&);
+    void removeCategory (const int&, const QString&);
+    void modSubChartData (const int&, const QString&, const int&, const QPair<double,double>&);
 };
 
 #endif

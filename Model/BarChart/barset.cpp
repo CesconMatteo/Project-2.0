@@ -42,6 +42,10 @@ void BarSet::erase(QList<double>::ConstIterator it) {
     values.erase(it);
 }
 
+void BarSet::removeAt (const int& i) {
+    values.removeAt(i);
+}
+
 void BarSet::replace (const int& pos, const double& x) {
     values.replace(pos, x);
 }
