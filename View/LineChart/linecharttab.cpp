@@ -123,7 +123,7 @@ void LineChartTab::setupScroll (Chart* chart) {
     scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     scroll->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    scroll->setSizeAdjustPolicy(QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents);    
+    scroll->setSizeAdjustPolicy(QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents);
     scroll->setWidget(scrollWidget);
 }
 
@@ -145,12 +145,12 @@ QChartView* LineChartTab::dxLayout (Chart* chart) {
         graphicChart->addSeries(line);              // ADD LINE
     }
 
-    /* GRAPHIC OPTIONS */
     graphicChart->createDefaultAxes();
     static_cast<QValueAxis*>(graphicChart->axes(Qt::Orientation::Horizontal).at(0))->setTickCount(10);
     static_cast<QValueAxis*>(graphicChart->axes(Qt::Orientation::Vertical).at(0))->setTickCount(10);
     graphicChart->axes(Qt::Orientation::Horizontal).at(0)->setTitleText("X");
     graphicChart->axes(Qt::Orientation::Vertical).at(0)->setTitleText("Y");
+
     chartView = new QChartView(graphicChart);
     chartView->setRenderHint(QPainter::Antialiasing);
     return chartView;
@@ -521,22 +521,25 @@ QList<QVariant> LineChartTab::modSubChartData() {
 }
 
 void LineChartTab::resizeAxis() {
-    double minX = std::numeric_limits<double>::max();
-    double maxX = std::numeric_limits<double>::min();
-    double minY = std::numeric_limits<double>::max();
-    double maxY = std::numeric_limits<double>::min();
-    for (int i=0; i < firstColoumn.size(); i++) {
-        for (int j=0; j < firstColoumn.at(i).size(); j++) {
-            if (static_cast<QLineEdit*>(firstColoumn.at(i).at(j))->text().toDouble() > maxX)
-                maxX = static_cast<QLineEdit*>(firstColoumn.at(i).at(j))->text().toDouble();
-            if (static_cast<QLineEdit*>(firstColoumn.at(i).at(j))->text().toDouble() < minX)
-                minX = static_cast<QLineEdit*>(firstColoumn.at(i).at(j))->text().toDouble();
-            if (static_cast<QLineEdit*>(secondColoumn.at(i).at(j))->text().toDouble() > maxY)
-                maxY = static_cast<QLineEdit*>(secondColoumn.at(i).at(j))->text().toDouble();
-            if (static_cast<QLineEdit*>(secondColoumn.at(i).at(j))->text().toDouble() < minY)
-                minY = static_cast<QLineEdit*>(secondColoumn.at(i).at(j))->text().toDouble();
+    if (firstColoumn.at(0).size() > 1) {
+
+        double minX = std::numeric_limits<double>::max();
+        double maxX = std::numeric_limits<double>::min();
+        double minY = std::numeric_limits<double>::max();
+        double maxY = std::numeric_limits<double>::min();
+        for (int i=0; i < firstColoumn.size(); i++) {
+            for (int j=0; j < firstColoumn.at(i).size(); j++) {
+                if (static_cast<QLineEdit*>(firstColoumn.at(i).at(j))->text().toDouble() > maxX)
+                    maxX = static_cast<QLineEdit*>(firstColoumn.at(i).at(j))->text().toDouble();
+                if (static_cast<QLineEdit*>(firstColoumn.at(i).at(j))->text().toDouble() < minX)
+                    minX = static_cast<QLineEdit*>(firstColoumn.at(i).at(j))->text().toDouble();
+                if (static_cast<QLineEdit*>(secondColoumn.at(i).at(j))->text().toDouble() > maxY)
+                    maxY = static_cast<QLineEdit*>(secondColoumn.at(i).at(j))->text().toDouble();
+                if (static_cast<QLineEdit*>(secondColoumn.at(i).at(j))->text().toDouble() < minY)
+                    minY = static_cast<QLineEdit*>(secondColoumn.at(i).at(j))->text().toDouble();
+            }
         }
+        chartView->chart()->axes(Qt::Orientation::Horizontal).at(0)->setRange(minX, maxX);
+        chartView->chart()->axes(Qt::Orientation::Vertical).at(0)->setRange(minY, maxY);
     }
-    chartView->chart()->axes(Qt::Orientation::Horizontal).at(0)->setRange(minX, maxX);
-    chartView->chart()->axes(Qt::Orientation::Vertical).at(0)->setRange(minY, maxY);
 }
