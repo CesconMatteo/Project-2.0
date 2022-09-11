@@ -323,7 +323,8 @@ QPair<QString, QString> PieChartTab::modChartData(const QString& chartDataName) 
     QFormLayout* layout = new QFormLayout();
     QLineEdit* newChartDataName = new QLineEdit(chartDataName);
     layout->addRow("Nome fetta", newChartDataName);
-    QLineEdit* newValue = new QLineEdit(firstColoumn.at(k).at(0)->text());
+    QString a = QString::fromStdString(firstColoumn.at(k).at(0)->text().toStdString().substr(7, firstColoumn.at(k).at(0)->text().size()));
+    QLineEdit* newValue = new QLineEdit(a);
     newValue->setValidator(new QRegularExpressionValidator(QRegularExpression("[+-]?([0-9]*[.])?[0-9]+")));
     layout->addRow("Valore", newValue);
 

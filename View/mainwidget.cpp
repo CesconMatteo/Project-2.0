@@ -158,7 +158,6 @@ void MainWidget::addNewTab(Chart* x) {
     }
 
     if (!_tabsOpened) {
-        delete tab->currentWidget();
         tab->removeTab(0);
         tab->setTabsClosable(true);
         _tabsOpened = true;
@@ -234,7 +233,6 @@ QString MainWidget::chooseTypeDialog() {
 
 void MainWidget::closeTab (const int& i) {
     if (i < tab->count() && i >= 0) {
-        delete tab->widget(i);
         tab->removeTab(i);
     }
     if (tab->count() == 0) {
