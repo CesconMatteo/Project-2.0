@@ -1,7 +1,11 @@
 #include "charttab.h"
 
 
-ChartTab::ChartTab(QWidget* parent) : QWidget(parent) {}
+ChartTab::ChartTab(QWidget* parent) : QWidget(parent) {
+    QPalette pal = QPalette();
+    pal.setColor(QPalette::Window, QColor(57,57,57));
+    setPalette(pal);
+}
 
 QFrame* ChartTab::createSeparator () {
     QFrame* separator = new QFrame();
