@@ -78,7 +78,7 @@ bool BarChart::load(const QString& _path) {
             QJsonObject singleBarSet = i.toObject();
             if (singleBarSet.contains("Name") && singleBarSet["Name"].isString() && singleBarSet.contains("Values") && singleBarSet["Values"].isArray()) {
                 BarSet* barSet = new BarSet(singleBarSet["Name"].toString());
-                for (unsigned int j=0; j < _categories.size(); j++) {
+                for (int j=0; j < _categories.size(); j++) {
                     if (j < singleBarSet["Values"].toArray().size())
                         barSet->push_back(singleBarSet["Values"].toArray().at(j).toDouble());
                     else

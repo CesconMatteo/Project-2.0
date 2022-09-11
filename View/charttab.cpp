@@ -42,8 +42,12 @@ QString ChartTab::delChartDataDialog() {
 void ChartTab::exportPDF (const QString& folder) {
 
     QString filename = QFileDialog::getSaveFileName(this, "Salva in", folder, "PDF files(*.pdf)");
+    if (filename.isEmpty())
+        return;
+    if (!filename.endsWith(".pdf"))
+        filename = filename.append(".pdf");
     QPdfWriter writer(filename);
-    writer.setPageSize(QPageSize::A4);
+    writer.setPageSize(QPagedPaintDevice::A4);
     QTextDocument doc;
     QPainter painter(&writer);
     chartView->render(&painter);

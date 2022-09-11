@@ -18,7 +18,11 @@ const QString& Chart::getPath() const {
 }
 
 void Chart::setPath (const QString& _path) {
+    if (_path.isEmpty())
+        return;
     path = _path;
+    if (!path.endsWith(".json"))
+        path = path.append(".json");
 }
 
 ChartData*& Chart::operator[](const int& i) {
