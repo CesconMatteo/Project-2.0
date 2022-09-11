@@ -36,9 +36,6 @@ MainWidget::MainWidget(QWidget *parent) : QWidget(parent) {
 
     tab->addTab(introTab, "Aprire un file");
 
-    QPalette pal = QPalette();
-    pal.setColor(QPalette::Window, QColor(50,50,50));
-    setPalette(pal);
     setAcceptDrops(true);
     setLayout(macroLayout);
 }
